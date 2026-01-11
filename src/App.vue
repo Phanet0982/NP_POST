@@ -14,7 +14,7 @@
         :current-date="currentDate" 
         @toggle-menu="toggleMenu"
       />
-
+    
       <div class="view-container container-fluid p-4 flex-grow-1">
         <div class="d-flex align-items-center justify-content-between mb-4">
           <div class="d-flex align-items-center border-start border-primary border-4 ps-3">
