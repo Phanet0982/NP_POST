@@ -1,8 +1,1 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* You can keep your custom Khmer font logic below if needed */
-body {
-  font-family: 'Khmer OS Battambang', sans-serif;
-}
+@import "tailwindcss";  
