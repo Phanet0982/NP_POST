@@ -20,7 +20,7 @@
       </button>
     </div>
 
-    <nav class="sidebar-nav py-4">
+    <nav class="sidebar-nav py-4 d-flex flex-column h-100">
       <div class="menu-section px-3">
         <small class="section-title text-muted mb-3 d-block px-3 text-uppercase fw-bold">
           មឺនុយមេ (MAIN MENU)
@@ -43,7 +43,9 @@
         </a>
       </div>
 
-      <div class="menu-section mt-auto px-3 pt-5">
+
+
+      <div class="menu-section mt-auto px-3 pt-5 pb-4">
         <small class="section-title text-muted mb-3 d-block px-3 text-uppercase fw-bold">
           តាមដានពួកយើង (FOLLOW US)
         </small>
@@ -64,10 +66,6 @@ const emit = defineEmits(["select", "toggle"]);
 
 const select = (cat) => emit("select", cat);
 
-/**
- * Assigns a specific icon based on the text of the menu item.
- * If the name doesn't match, it falls back to a default grid icon.
- */
 const getIcon = (name) => {
   const iconMap = {
     'ព័ត៌មានជាតិ': 'bi-newspaper',
@@ -78,10 +76,9 @@ const getIcon = (name) => {
     'កម្សាន្ត': 'bi-music-note-beamed',
     'សុខភាព': 'bi-heart-pulse-fill',
     'អប់រំ': 'bi-book-half',
-    'សង្គម': 'bi-people-fill'
+    'សង្គម': 'bi-people-fill',
+    'ការគ្រប់គ្រង': 'bi-speedometer2'
   };
-  
-  // Return the specific icon or a default if not found
   return iconMap[name] || 'bi-grid-fill';
 };
 </script>
@@ -98,6 +95,16 @@ const getIcon = (name) => {
   display: flex;
   flex-direction: column;
   border-right: 1px solid #f1f1f1;
+}
+
+/* Specific Style for Admin Item to make it stand out */
+.admin-item:hover {
+  background: #fff5f5 !important;
+  color: #dc3545 !important;
+}
+.admin-item.active {
+  background: #dc3545 !important;
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2) !important;
 }
 
 /* Header & Logo */

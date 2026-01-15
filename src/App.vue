@@ -1,5 +1,9 @@
 <template>
-  <div class="app-layout">
+  <div v-if="isManagementPage" class="management-standalone">
+    <router-view />
+  </div>
+
+  <div v-else class="app-layout">
     <NavbarPage 
       :menu-items="categories" 
       :active-cat="activeCat" 
@@ -9,7 +13,6 @@
     />
 
     <main class="main-content d-flex flex-column">
-      
       <HeaderPage 
         :current-date="currentDate" 
         @toggle-menu="toggleMenu"
@@ -17,10 +20,11 @@
     
       <div class="view-container container-fluid p-4 flex-grow-1">
         <div class="d-flex align-items-center justify-content-between mb-4">
-          <div class="d-flex align-items-center border-start border-primary border-4 ps-3">
-            <h3 class="fw-bold m-0 text-dark">
-               {{ activeCat === 'Home' ? 'ទំព័រដើម' : activeCat }}
+          <div class="d-flex align-items-center border-0 border-start border-primary border-5 ps-3 py-2 bg-light-gradient rounded-end shadow-sm">
+            <h3 class="category-title fw-bold m-0 text-dark">
+              {{ activeCat === 'Home' ? 'ទំព័រដើម' : (activeCat === 'Management' ? 'ការគ្រប់គ្រង' : activeCat) }}
             </h3>
+            <div class="flex-grow-1 ms-3 border-bottom border-light d-none d-md-block"></div>
           </div>
           <div class="breadcrumb small text-muted d-none d-md-block">
             NP News <i class="bi bi-chevron-right mx-1"></i> {{ activeCat }}
@@ -51,7 +55,7 @@ import { useRouter, useRoute } from 'vue-router';
 // Component Imports
 import NavbarPage from './components/NavbarPage.vue';
 import FooterPage from './components/FooterPage.vue';
-import HeaderPage from './components/HeaderPage.vue'; // New Import
+import HeaderPage from './components/HeaderPage.vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -60,8 +64,15 @@ const categories = ["ពេញនិយម", "កីឡា", "បច្ចេក
 const isMobileMenuOpen = ref(false);
 const currentDate = ref('');
 
+/**
+ * Identify if we are on the management page to strip away the layout
+ */
+const isManagementPage = computed(() => {
+  return route.name === 'Management';
+});
+
 const activeCat = computed(() => {
-  return route.meta.label || 'Home';
+  return route.meta.label || route.name || 'Home';
 });
 
 const handleCategorySelect = (categoryName) => {
@@ -71,7 +82,8 @@ const handleCategorySelect = (categoryName) => {
     'កីឡា': 'Sports',
     'បច្ចេកវិទ្យា': 'Tech',
     'កម្សាន្ត': 'Entertainment',
-    'សង្គម': 'Society'
+    'សង្គម': 'Society',
+    'ការគ្រប់គ្រង': 'Management' // Combined logic for the Dashboard link
   };
 
   const targetRoute = routeMap[categoryName];
@@ -109,12 +121,21 @@ onUnmounted(() => {
 </script>
 
 <style>
-/* Global Layout Styles Kept Here */
+/* 1. Standalone Layout (Outside Application) */
+.management-standalone {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #f1f5f9; /* Slightly different gray to distinguish admin area */
+  margin: 0;
+  padding: 0;
+}
+
+/* 2. Main Layout (Inside Application) */
 .app-layout {
   display: flex;
   min-height: 100vh;
   background-color: #f8f9fa;
-  font-family: 'Khmer OS Battambang', Arial, sans-serif;
+  font-family: 'Khmer OS Battambang', 'Kantumruy Pro', Arial, sans-serif;
 }
 
 .main-content {
@@ -125,6 +146,7 @@ onUnmounted(() => {
   min-height: 100vh; 
 }
 
+/* Adjust for responsive screens */
 @media (max-width: 991.98px) {
   .main-content {
     margin-left: 0;
@@ -139,7 +161,7 @@ onUnmounted(() => {
   }
 }
 
-/* Page Transitions Kept Here */
+/* Smooth Page Transitions */
 .page-fade-enter-active,
 .page-fade-leave-active {
   transition: opacity 0.3s ease, transform 0.3s ease;

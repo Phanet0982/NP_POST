@@ -1,64 +1,146 @@
 <template>
-  <div class="popular-section p-2">
-    <div class="flex items-center justify-between mb-8">
-      <div class="flex items-center gap-3">
-        <div class="h-10 w-1.5 bg-gradient-to-b from-blue-600 to-blue-400 rounded-full"></div>
-        <h2 class="text-3xl font-black text-slate-800 tracking-tight">ពេញនិយម</h2>
+  <div class="container py-4 font-khmer">
+    
+    <div v-if="!selectedNews">
+      <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+        <h2 class="fw-black text-dark mb-0">ព័ត៌មានពេញនិយម</h2>
+        <span class="badge bg-danger px-3">Trending Now</span>
       </div>
-      <div class="flex gap-2">
-        <button class="p-2 rounded-full border border-gray-200 hover:bg-white hover:shadow-md transition-all"><i class="bi bi-chevron-left"></i></button>
-        <button class="p-2 rounded-full border border-gray-200 hover:bg-white hover:shadow-md transition-all"><i class="bi bi-chevron-right"></i></button>
-      </div>
-    </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      <div class="lg:col-span-7 group cursor-pointer">
-        <div class="relative overflow-hidden rounded-[2rem] shadow-xl aspect-[16/10]">
-          <img 
-            src="https://picsum.photos/seed/pop1/800/500" 
-            class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-            alt="Featured Popular"
-          >
-          <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/20 to-transparent"></div>
-          
-          <div class="absolute bottom-0 p-6 md:p-8">
-            <span class="bg-blue-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase mb-4 inline-block">Trending No. 1</span>
-            <h3 class="text-2xl md:text-3xl font-black text-white leading-tight mb-3">
-              អត្ថបទដែលទទួលបានការចាប់អារម្មណ៍ខ្លាំងបំផុតប្រចាំសប្តាហ៍នេះ
-            </h3>
-            <div class="flex items-center gap-4 text-gray-300 text-sm">
-              <span class="flex items-center gap-1"><i class="bi bi-clock"></i> ៥ នាទីមុន</span>
-              <span class="flex items-center gap-1"><i class="bi bi-eye"></i> ១២.៥K នាក់</span>
+      <div v-if="filteredNews.length > 0" class="row g-4">
+        <div v-for="item in filteredNews" :key="item.id" class="col-12 col-md-6 col-lg-4">
+          <div @click="viewDetail(item)" class="card h-100 border-0 shadow-sm hover-up rounded-4 overflow-hidden">
+            <div class="position-relative">
+              <img :src="item.image" class="card-img-top clickable-img" style="height: 220px; object-fit: cover;">
+              <div class="position-absolute top-0 end-0 p-2">
+                <span class="badge bg-danger rounded-pill">{{ item.badge || 'Popular' }}</span>
+              </div>
+            </div>
+            <div class="card-body p-4">
+              <h5 class="card-title fw-bold text-dark mb-3 line-clamp-2">{{ item.title }}</h5>
+              <p class="text-muted small mb-0"><i class="bi bi-calendar3 me-2"></i>{{ item.date }}</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="lg:col-span-5 flex flex-col gap-4">
-        <div 
-          v-for="n in 3" 
-          :key="n" 
-          class="flex items-center gap-4 p-3 rounded-3xl transition-all duration-300 hover:bg-white hover:shadow-xl hover:shadow-blue-900/5 group cursor-pointer border border-transparent hover:border-blue-50"
-        >
-          <div class="w-24 h-24 md:w-32 md:h-24 flex-shrink-0 overflow-hidden rounded-2xl shadow-sm">
-            <img 
-              :src="`https://picsum.photos/seed/pop${n+1}/300/300`" 
-              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-            >
-          </div>
-          <div class="flex-grow">
-            <div class="flex items-center gap-2 mb-1">
-              <span class="text-[10px] font-bold text-blue-500 uppercase">ចំណាត់ថ្នាក់ #{{ n + 1 }}</span>
+      <div v-else class="text-center py-5">
+        <i class="bi bi-folder2-open display-1 text-muted opacity-25"></i>
+        <p class="mt-3 text-muted">មិនមានព័ត៌មានក្នុងផ្នែកនេះឡើយ</p>
+      </div>
+    </div>
+
+    <div v-else class="row g-5">
+      <div class="col-lg-8">
+        <nav aria-label="breadcrumb">
+          <button @click="selectedNews = null" class="btn btn-link text-primary p-0 mb-4 d-inline-flex align-items-center text-decoration-none fw-bold">
+            <i class="bi bi-arrow-left me-2"></i> ត្រឡប់ក្រោយ
+          </button>
+        </nav>
+
+        <h4 class="fw-bold text-dark mb-3 lh-base">{{ selectedNews.title }}</h4>
+        
+        <div class="mb-4 border-bottom pb-3 text-muted small">
+          By <span class="fw-bold text-dark text-uppercase">Editorial Team</span> • {{ selectedNews.date }}
+        </div>
+
+        <img :src="selectedNews.image" class="img-fluid rounded-4 mb-3 shadow-sm w-100" style="max-height: 450px; object-fit: cover;">
+        <p class="text-muted fst-italic mb-4  ">រូបភាពតំណាង៖ {{ selectedNews.title }}</p>
+
+        <div class="article-body fs-5 lh-lg mb-5 text-dark">
+          <p v-if="selectedNews.content" v-html="selectedNews.content"></p>
+          <p v-else>
+            អត្ថបទពេញលេញសម្រាប់ព័ត៌មាននេះ កំពុងត្រូវបានបញ្ចូលទៅក្នុងប្រព័ន្ធ។ សូមអញ្ជើញមកពិនិត្យមើលឡើងវិញនៅពេលក្រោយ។
+          </p>
+        </div>
+
+        <hr>
+
+        <h4 class="fw-bold mb-4 mt-5">ព័ត៌មានទាក់ទង</h4>
+        <div class="row g-3">
+          <div v-for="related in getRelated()" :key="'rel-'+related.id" class="col-md-4">
+            <div @click="viewDetail(related)" class="cursor-pointer group">
+              <img :src="related.image" class="img-fluid rounded-3 mb-2 clickable-img shadow-sm" style="height: 120px; width: 100%; object-fit: cover;">
+              <h6 class="fw-bold small line-clamp-2 group-hover-text-primary text-dark">{{ related.title }}</h6>
             </div>
-            <h4 class="font-bold text-slate-800 leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors">
-              ព្រឹត្តិការណ៍ថ្មីដែលអ្នកមិនគួររំលង...
-            </h4>
-            <p class="text-xs text-slate-400 mt-2 flex items-center gap-3">
-              <span><i class="bi bi-calendar3"></i> ១១ មករា ២០២៦</span>
-            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="sticky-top" style="top: 20px;">
+          <h5 class="fw-bold pb-2 mb-4 ">ពេញនិយមបំផុត</h5>
+          <div v-for="pop in filteredNews.slice(0, 6)" :key="'pop-'+pop.id" class="d-flex mb-4 gap-3 cursor-pointer align-items-start" @click="viewDetail(pop)">
+            <img :src="pop.image" class="rounded clickable-img shadow-sm" style="width: 100px; height: 70px; object-fit: cover; flex-shrink: 0;">
+            <div>
+              <h6 class="mb-1 fw-bold small line-clamp-2" style="line-height: 1.4;">{{ pop.title }}</h6>
+              <span class="text-danger fw-bold" style="font-size: 0.7rem;">{{ pop.date }}</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
+
+<script setup>
+import { ref, onMounted } from 'vue';
+
+const filteredNews = ref([]); // Stores the list of popular news
+const selectedNews = ref(null); // Stores the currently viewed article
+
+// Logic to switch to Detail View
+const viewDetail = (item) => {
+  selectedNews.value = item;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+// Logic for related news (filters out current item)
+const getRelated = () => {
+  return filteredNews.value.filter(item => item.id !== selectedNews.value?.id).slice(0, 3);
+};
+
+onMounted(() => {
+  const data = localStorage.getItem('app_news_data');
+  if (data) {
+    const allNews = JSON.parse(data);
+    // Filter to only show news tagged as "Popular"
+    filteredNews.value = allNews.filter(n => n.category === 'Popular');
+  }
+});
+</script>
+
+<style scoped>
+.font-khmer { font-family: 'Kantumruy Pro', sans-serif; }
+.cursor-pointer { cursor: pointer; }
+
+/* Same Hover Effects as Home.vue */
+.clickable-img { 
+  cursor: pointer; 
+  transition: all 0.3s ease; 
+}
+.clickable-img:hover { 
+  opacity: 0.9; 
+  transform: scale(1.03);
+}
+
+.line-clamp-2 { 
+  display: -webkit-box; 
+  -webkit-line-clamp: 2; 
+  -webkit-box-orient: vertical; 
+  overflow: hidden; 
+}
+
+.hover-up { 
+  transition: transform 0.3s ease, box-shadow 0.3s ease; 
+  cursor: pointer; 
+}
+.hover-up:hover { 
+  transform: translateY(-8px); 
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.sticky-top { z-index: 10; }
+
+.fw-black { font-weight: 900; }
+</style>

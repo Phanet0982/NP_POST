@@ -7,13 +7,14 @@ import Sports from "../views/Sports.vue";
 import Tech from "../views/Technology.vue";
 import Entertainment from "../views/Entertainment.vue";
 import Society from "../views/Society.vue";
+import Management from "../dashboard/Management.vue";
 
 const routes = [
   {
     path: "/",
     name: "Home",
     component: Home,
-    meta: { label: "Home" }, // English key for internal logic
+    meta: { label: "Home" },
   },
   {
     path: "/popular",
@@ -45,6 +46,13 @@ const routes = [
     component: Society,
     meta: { label: "សង្គម" },
   },
+  {
+    path: "/management",
+    name: "Management",
+    component: Management,
+    // Add meta requiresAuth to protect this route
+    meta: { label: "Admin Dashboard", requiresAuth: true }, 
+  },
 ];
 
 const router = createRouter({
@@ -57,6 +65,24 @@ const router = createRouter({
       return { top: 0, behavior: "smooth" };
     }
   },
+});
+
+// --- GLOBAL SECURITY GUARD ---
+router.beforeEach((to, from, next) => {
+  const isAdmin = localStorage.getItem('admin_status') === 'true';
+  const isLoggedIn = localStorage.getItem('np_news_user') !== null;
+
+  // Check if the route requires authentication
+  if (to.meta.requiresAuth) {
+    if (isLoggedIn && isAdmin) {
+      next(); // User is Admin, allow access
+    } else {
+      alert("សូមចូលប្រើប្រាស់ជា Admin ជាមុនសិន!");
+      next('/'); // Kick back to home page
+    }
+  } else {
+    next(); // Public route, always allow
+  }
 });
 
 export default router;

@@ -1,55 +1,168 @@
 <template>
-  <div class="tech p-6 bg-slate-50 rounded-[2.5rem] border border-gray-100 shadow-inner">
-    <div class="flex items-center justify-between mb-10">
-      <div class="flex items-center gap-4">
-        <div class="relative">
-          <div class="absolute -inset-1 bg-cyan-400 rounded-full blur opacity-25 animate-pulse"></div>
-          <div class="relative w-3 h-10 bg-cyan-500 rounded-full"></div>
+  <div class="container py-4 font-khmer">
+
+    <div v-if="!selectedNews">
+      <div v-if="filteredNews.length > 0" class="row g-4">
+        <div v-for="item in filteredNews" :key="item.id" class="col-md-6 col-lg-4">
+          <div @click="viewDetail(item)" class="card h-100 border-0 shadow-sm tech-card overflow-hidden cursor-pointer">
+            <div class="position-relative overflow-hidden">
+              <img :src="item.image" class="card-img-top tech-img" :alt="item.title">
+              <div class="position-absolute bottom-0 start-0 p-3 w-100 bg-gradient-dark">
+                 <span class="badge bg-dark text-info border border-info rounded-pill px-3">{{ item.badge || 'បច្ចេកវិទ្យា' }}</span>
+              </div>
+            </div>
+            <div class="card-body p-4">
+              <p class="text-info small fw-bold mb-2"><i class="bi bi-calendar3 me-2"></i>{{ item.date }}</p>
+              <h5 class="card-title fw-bold text-dark mb-3 line-clamp-2 lh-base">{{ item.title }}</h5>
+              <div class="d-flex align-items-center text-muted small mt-auto">
+                 <span class="me-3 cursor-pointer hover-tech"><i class="bi bi-hand-thumbs-up me-1"></i> ចូលចិត្ត</span>
+                 <span class="cursor-pointer hover-tech"><i class="bi bi-share me-1"></i> ចែករំលែក</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <h2 class="text-3xl font-black text-slate-800 tracking-tight">បច្ចេកវិទ្យា</h2>
       </div>
-      <button class="text-cyan-600 font-bold text-sm hover:underline">មើលទាំងអស់</button>
+
+      <div v-else class="text-center py-5 bg-white rounded-4 shadow-sm border border-dashed">
+        <div class="py-5">
+          <i class="bi bi-gpu-card text-muted opacity-25" style="font-size: 5rem;"></i>
+          <h4 class="text-muted mt-3">មិនទាន់មានព័ត៌មានបច្ចេកវិទ្យានៅឡើយទេ</h4>
+          <p class="text-muted small">សូមបន្ថែមព័ត៌មានក្នុង Dashboard ដោយជ្រើសរើសប្រភេទ "Tech"</p>
+        </div>
+      </div>
     </div>
 
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      <div 
-        v-for="n in 8" 
-        :key="n" 
-        class="group relative bg-white rounded-3xl p-5 transition-all duration-500 hover:-translate-y-2 border border-transparent hover:border-cyan-200 hover:shadow-[0_20px_50px_rgba(8,112,184,0.1)]"
-      >
-        <div class="absolute inset-0 bg-gradient-to-br from-cyan-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl"></div>
+    <div v-else class="row g-5">
+      <div class="col-lg-8">
+        <nav aria-label="breadcrumb">
+          <button @click="selectedNews = null" class="btn btn-link text-info p-0 mb-4 d-inline-flex align-items-center text-decoration-none fw-bold">
+            <i class="bi bi-arrow-left me-2"></i> ត្រឡប់ក្រោយ
+          </button>
+        </nav>
 
-        <div class="relative z-10 flex flex-col items-center">
-          <div class="relative mb-4">
-            <div class="absolute -inset-2 bg-gradient-to-tr from-cyan-500 to-blue-400 rounded-2xl opacity-0 group-hover:opacity-20 transition-all duration-500 group-hover:rotate-12"></div>
-            <img 
-              :src="`https://picsum.photos/seed/tech${n}/300/300`" 
-              class="w-24 h-24 object-cover rounded-2xl shadow-lg border-2 border-white transition-transform duration-500 group-hover:scale-110"
-              alt="Tech Product"
-            >
+        <h4 class="fw-bold text-dark mb-3 lh-base">{{ selectedNews.title }}</h4>
+        
+        <div class="mb-4 border-bottom pb-3 text-muted small">
+          ប្រភេទ៖ <span class="fw-bold text-info text-uppercase">Technology</span> • {{ selectedNews.date }}
+        </div>
+
+        <img :src="selectedNews.image" class="img-fluid rounded-4 mb-3 shadow-sm w-100" style="max-height: 450px; object-fit: cover;">
+        
+        <div class="article-body fs-5 lh-lg mb-5 text-dark">
+          <div v-if="selectedNews.content" v-html="selectedNews.content"></div>
+          <p v-else>ខ្លឹមសារបច្ចេកវិទ្យាលម្អិត កំពុងត្រូវបានបញ្ចូលទៅក្នុងប្រព័ន្ធ។</p>
+        </div>
+
+        <hr>
+        <h4 class="fw-bold mb-4 mt-5">អត្ថបទបច្ចេកវិទ្យាពាក់ព័ន្ធ</h4>
+        <div class="row g-3">
+          <div v-for="related in getRelated()" :key="'rel-'+related.id" class="col-md-4">
+            <div @click="viewDetail(related)" class="cursor-pointer tech-related-group">
+              <img :src="related.image" class="img-fluid rounded-3 mb-2 shadow-sm" style="height: 120px; width: 100%; object-fit: cover;">
+              <h6 class="fw-bold small line-clamp-2 text-dark">{{ related.title }}</h6>
+            </div>
           </div>
+        </div>
+      </div>
 
-          <div class="text-center">
-            <span class="text-[10px] font-black text-cyan-500 uppercase tracking-[0.2em] mb-2 block">Premium 2026</span>
-            <h6 class="font-bold text-slate-700 leading-snug group-hover:text-cyan-600 transition-colors">
-              ផលិតផលថ្មីប្រចាំឆ្នាំ ២០២៦
-            </h6>
-            
-            <div class="mt-4 overflow-hidden h-0 group-hover:h-8 transition-all duration-500">
-              <button class="flex items-center gap-2 text-xs font-bold text-cyan-600 mx-auto">
-                ព័ត៌មានបន្ថែម <i class="bi bi-arrow-right"></i>
-              </button>
+      <div class="col-lg-4">
+        <div class="sticky-top" style="top: 20px;">
+          <h5 class="fw-bold pb-2 mb-4 border-bottom border-info text-dark">បច្ចេកវិទ្យាថ្មីៗ</h5>
+          <div v-for="pop in filteredNews.slice(0, 5)" :key="'side-'+pop.id" class="d-flex mb-4 gap-3 cursor-pointer" @click="viewDetail(pop)">
+            <img :src="pop.image" class="rounded shadow-sm" style="width: 100px; height: 70px; object-fit: cover; flex-shrink: 0;">
+            <div>
+              <h6 class="mb-1 fw-bold small line-clamp-2" style="line-height: 1.4;">{{ pop.title }}</h6>
+              <span class="text-info small" style="font-size: 0.75rem;">{{ pop.date }}</span>
             </div>
           </div>
         </div>
       </div>
     </div>
+
   </div>
 </template>
 
+<script setup>
+import { ref, onMounted } from 'vue';
+
+const filteredNews = ref([]);
+const selectedNews = ref(null); // Track selected article
+
+// Logic for Detail View
+const viewDetail = (item) => {
+  selectedNews.value = item;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+// Filter related tech items
+const getRelated = () => {
+  return filteredNews.value
+    .filter(item => item.id !== selectedNews.value?.id)
+    .slice(0, 3);
+};
+
+onMounted(() => {
+  const data = localStorage.getItem('app_news_data');
+  if (data) {
+    const allNews = JSON.parse(data);
+    filteredNews.value = allNews.filter(n => n.category === 'Tech');
+  }
+});
+</script>
+
 <style scoped>
-/* Custom Cubic Bezier for smooth tech feel */
-.tech div {
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+.font-khmer { font-family: 'Kantumruy Pro', sans-serif; }
+.cursor-pointer { cursor: pointer; }
+
+/* Tech Card & Hover Effects */
+.tech-card {
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent !important;
 }
+
+.tech-card:hover {
+  transform: translateY(-5px);
+  border-bottom: 3px solid #38bdf8 !important; /* Sky Blue accent */
+}
+
+.tech-img {
+  height: 220px;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.tech-card:hover .tech-img {
+  transform: scale(1.1);
+}
+
+.tech-related-group:hover img {
+  opacity: 0.8;
+  transform: translateY(-2px);
+  transition: 0.3s;
+}
+
+.bg-gradient-dark {
+  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+}
+
+.text-info {
+  color: #0284c7 !important;
+}
+
+.border-info {
+  border-color: #0284c7 !important;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.hover-tech:hover {
+  color: #0284c7 !important;
+}
+
+.sticky-top { z-index: 10; }
 </style>
