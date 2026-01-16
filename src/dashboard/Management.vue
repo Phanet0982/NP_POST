@@ -1,243 +1,273 @@
 <template>
-  <div class="min-h-screen bg-[#f8fafc] font-khmer pb-12">
-    <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
-      <div class="max-w-[1600px] mx-auto px-6 h-18 flex items-center justify-between py-3">
-        <div class="flex items-center gap-6">
+  <div class="min-h-screen bg-gray-100 font-khmer flex flex-col lg:flex-row">
+    
+    <aside class="hidden lg:flex w-72 bg-slate-900 flex-col text-white sticky top-0 h-screen">
+      <div class="p-6">
+        <div class="mb-10 px-2">
           <div class="flex items-center gap-3 cursor-pointer group" @click="router.push('/')">
-            <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200 group-hover:rotate-6 transition-transform">
-              <i class="bi bi-layers-half text-xl"></i>
+            <div class="relative">
+              <img src="https://png.pngtree.com/png-vector/20220714/ourmid/pngtree-np-icon-vector-illustration-design-letter-monogram-alphabet-vector-png-image_37915324.png" 
+                   alt="Logo" 
+                   class="w-11 h-11 rounded-xl object-contain bg-white p-1 shadow-lg group-hover:scale-105 transition-transform" />
+              <div class="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-500 border-2 border-slate-900 rounded-full"></div>
             </div>
-            <div>
-              <h1 class="text-sm font-black text-slate-800 tracking-tight uppercase leading-none">ព័ត៌មានថ្មីៗ</h1>
-              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">ផ្ទាំងគ្រប់គ្រង</span>
+            <div class="flex flex-col">
+              <h1 class="text-xl font-black tracking-tight leading-none text-white">
+                NP <span class="text-blue-500">News</span>
+              </h1>
+              <span class="text-[9px] text-slate-500 font-bold uppercase tracking-[0.2em] mt-1 leading-none">Digital Media</span>
             </div>
           </div>
         </div>
-        
-        <div class="flex items-center gap-5">
-          <div class="text-right hidden sm:block border-r border-slate-200 pr-5">
-            <p class="text-[10px] font-black text-indigo-600 uppercase mb-0 tracking-tighter">គណនីដែលមានសិទ្ធិ</p>
-            <p class="text-sm font-bold text-slate-700 mb-0">{{ user?.name || 'អ្នកគ្រប់គ្រង' }}</p>
-          </div>
-          <button @click="handleLogout" 
-            class="group flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-red-600 hover:border-red-100 hover:bg-red-50 transition-all shadow-sm">
-            <span class="text-xs font-black uppercase tracking-wider hidden md:block">ចាកចេញ</span>
-            <i class="bi bi-box-arrow-right"></i>
+
+        <nav class="space-y-1">
+          <button v-for="nav in tableTabs" :key="nav.id"
+            @click="activeTableTab = nav.id"
+            :class="activeTableTab === nav.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20' : 'hover:bg-slate-800 text-slate-400'"
+            class="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all group">
+            <div class="flex items-center gap-3">
+              <i :class="getIconForCategory(nav.id)" class="text-lg"></i>
+              <span class="text-sm font-medium">{{ nav.name }}</span>
+            </div>
+            <span :class="activeTableTab === nav.id ? 'bg-blue-500' : 'bg-slate-800'" 
+                  class="text-[10px] px-2 py-0.5 rounded text-slate-100">
+              {{ getCategoryCount(nav.id) }}
+            </span>
           </button>
-        </div>
+        </nav>
       </div>
-    </header>
 
-    <main class="max-w-[1600px] mx-auto p-6 lg:p-8">
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5 mb-10">
-        <div v-for="stat in stats" :key="stat.label" 
-             class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden group">
-          <div class="relative z-10">
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">{{ stat.label }}</p>
-            <div class="flex items-end justify-between">
-              <span class="text-3xl font-black text-slate-800 tracking-tighter">{{ stat.count }}</span>
-              <div :class="stat.textColor" class="bg-slate-50 p-2 rounded-lg">
-                <i class="bi bi-bar-chart-fill"></i>
-              </div>
-            </div>
+      <div class="mt-auto p-6 border-t border-slate-800 bg-slate-950/50">
+        <div class="flex items-center gap-3 mb-4">
+          <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" class="w-10 h-10 rounded-xl border border-slate-700">
+          <div class="overflow-hidden">
+            <p class="text-sm font-bold truncate">Administrator</p>
+            <p class="text-[10px] text-emerald-400 uppercase font-bold tracking-widest">Online</p>
           </div>
-          <div :class="stat.bgColor" class="absolute bottom-0 left-0 h-1 w-full opacity-40"></div>
         </div>
+        <button @click="handleLogout" class="w-full py-2.5 bg-red-500/10 hover:bg-red-600 text-red-500 hover:text-white rounded-lg text-xs font-bold transition-all uppercase tracking-widest">
+          Logout
+        </button>
       </div>
+    </aside>
 
-      <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
-        <div class="xl:col-span-4">
-          <div class="bg-white p-6 lg:p-8 rounded-3xl border border-slate-200 shadow-sm sticky top-28">
-            <div class="flex items-center justify-between mb-8">
-              <h2 class="text-xs font-black text-slate-800 uppercase tracking-[2px] flex items-center gap-2">
-                <span class="w-3 h-3 bg-indigo-600 rounded-full animate-pulse"></span>
-                តែងនិពន្ធអត្ថបទ
-              </h2>
-            </div>
+    <div class="flex-1 flex flex-col min-w-0 overflow-x-hidden">
+      
+      <header class="lg:hidden bg-slate-900 text-white p-4 flex justify-between items-center sticky top-0 z-50">
+        <div class="flex items-center gap-2">
+          <img src="https://png.pngtree.com/png-vector/20220714/ourmid/pngtree-np-icon-vector-illustration-design-letter-monogram-alphabet-vector-png-image_37915324.png" class="w-8 h-8 rounded bg-white p-0.5">
+          <span class="font-bold text-sm">NP News Admin</span>
+        </div>
+        <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-2xl">
+          <i class="bi" :class="mobileMenuOpen ? 'bi-x' : 'bi-list'"></i>
+        </button>
+      </header>
+
+      <header class="hidden lg:flex bg-white border-b border-gray-200 px-8 h-20 items-center justify-between sticky top-0 z-40">
+        <div class="flex flex-col">
+          <h2 class="font-bold text-gray-800 text-lg leading-none mb-1">ប្រព័ន្ធគ្រប់គ្រងព័ត៌មាន</h2>
+          <div class="flex items-center gap-2">
             
-            <div class="space-y-5">
-              <div class="space-y-2">
-                <label class="text-[10px] font-black text-slate-500 uppercase px-1">ចំណងជើងអត្ថបទ</label>
-                <textarea v-model="form.title" rows="3" placeholder="តើមានព័ត៌មានអ្វីខ្លះថ្ងៃនេះ?" 
-                  class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50 transition-all font-bold text-sm leading-relaxed"></textarea>
-              </div>
-
-              <div class="grid grid-cols-2 gap-4">
-                <div class="space-y-2">
-                  <label class="text-[10px] font-black text-slate-500 uppercase px-1">ប្រភេទ</label>
-                  <select v-model="form.category" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white font-bold text-xs appearance-none cursor-pointer">
-                    <option v-for="cat in categoriesKhmer" :key="cat.en" :value="cat.en">{{ cat.kh }}</option>
-                  </select>
-                </div>
-                <div class="space-y-2">
-                  <label class="text-[10px] font-black text-slate-500 uppercase px-1">ស្លាកសញ្ញា (Badge)</label>
-                  <input v-model="form.badge" type="text" placeholder="ឧទាហរណ៍៖ ក្តៅៗ" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white font-bold text-xs uppercase">
-                </div>
-              </div>
-
-              <div class="space-y-2">
-                <label class="text-[10px] font-black text-slate-500 uppercase px-1">រូបភាពតំណាង</label>
-                <div v-if="!form.image" class="group">
-                  <label class="flex flex-col items-center justify-center w-full h-40 border-2 border-slate-200 border-dashed rounded-2xl cursor-pointer bg-slate-50 hover:bg-white hover:border-indigo-400 transition-all group">
-                    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-3 group-hover:scale-110 transition-transform">
-                        <i class="bi bi-cloud-arrow-up text-indigo-500 text-xl"></i>
-                    </div>
-                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">បញ្ចូលរូបភាព (JPG, PNG, WEBP)</p>
-                    <input type="file" class="hidden" accept="image/*" @change="handleImageUpload" />
-                  </label>
-                </div>
-                <div v-else class="relative rounded-2xl overflow-hidden h-40 border-2 border-slate-100 group">
-                  <img :src="form.image" class="w-full h-full object-cover" />
-                  <div @click="form.image = ''" class="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all cursor-pointer">
-                    <span class="bg-white text-slate-900 px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-tighter">បោះបង់ និងប្តូររូបភាព</span>
-                  </div>
-                </div>
-              </div>
-
-              <button @click="publishNews" class="w-full py-4 bg-slate-900 hover:bg-indigo-600 text-white font-black rounded-2xl shadow-xl shadow-slate-200 transition-all transform active:scale-[0.97] text-[10px] uppercase tracking-[3px] mt-4">
-                បង្ហោះចូលក្នុងប្រព័ន្ធ
-              </button>
-            </div>
+            <p class="text-[10px] text-blue-600 font-bold uppercase tracking-wider">{{ activeTableTab }}</p>
           </div>
         </div>
 
-        <div class="xl:col-span-8">
-          <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="px-8 py-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4 bg-white">
-              <div>
-                <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest">បញ្ជីអត្ថបទដែលបានបង្ហោះ</h3>
-                <p class="text-[10px] font-bold text-slate-400 mt-1">គ្រប់គ្រង និងតាមដានមាតិកាដែលបានចេញផ្សាយ</p>
-              </div>
-              <div class="relative w-full sm:w-72">
-                <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                <input v-model="searchQuery" type="text" placeholder="ស្វែងរកអត្ថបទ..." 
-                       class="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold focus:bg-white focus:border-indigo-400 focus:ring-0 outline-none transition-all">
+        <div class="relative group">
+          <i class="bi bi-search absolute left-4 top-8 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors"></i>
+          <input 
+            v-model="searchQuery" 
+            type="text" 
+            placeholder="ស្វែងរកអត្ថបទ..." 
+            class="w-80 pl-11 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none"
+          >
+        </div>
+      </header>
+
+      <main class="p-4 lg:p-8 space-y-6">
+        
+        <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 lg:gap-4">
+          <div v-for="tab in tableTabs" :key="tab.id" 
+               @click="activeTableTab = tab.id"
+               class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:border-blue-500 hover:shadow-md cursor-pointer transition-all flex flex-col items-center text-center group">
+            <div :class="activeTableTab === tab.id ? 'bg-blue-600 text-white' : 'bg-slate-50 text-slate-400'" 
+                 class="w-12 h-12 rounded-xl flex items-center justify-center text-xl mb-3 transition-all">
+              <i :class="getIconForCategory(tab.id)"></i>
+            </div>
+            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1 leading-none">{{ tab.name }}</p>
+            <p class="text-xl font-black text-slate-800">{{ getCategoryCount(tab.id) }}</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <div class="xl:col-span-1">
+            <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm sticky top-28">
+              <h3 class="font-bold text-gray-800 mb-6 flex items-center gap-2">
+                <i class="bi bi-plus-circle-fill text-blue-600"></i> បញ្ចូលព័ត៌មានថ្មី
+              </h3>
+              <div class="space-y-5">
+                <div class="space-y-1">
+                   <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">ចំណងជើង</label>
+                   <textarea v-model="form.title" rows="3" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-1 focus:ring-blue-500 outline-none"></textarea>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">ប្រភេទ</label>
+                    <select v-model="form.category" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold">
+                      <option v-for="cat in categoriesKhmer" :key="cat.en" :value="cat.en">{{ cat.kh }}</option>
+                    </select>
+                  </div>
+                  <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">ស្លាក</label>
+                    <input v-model="form.badge" placeholder="ឧ. HOT" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold uppercase">
+                  </div>
+                </div>
+
+                <div @click="$refs.fileInput.click()" class="h-32 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 flex flex-col items-center justify-center cursor-pointer overflow-hidden group hover:border-blue-400 transition-all">
+                  <img v-if="form.image" :src="form.image" class="w-full h-full object-cover">
+                  <template v-else>
+                    <i class="bi bi-image text-gray-300 text-2xl group-hover:text-blue-500 transition-colors"></i>
+                    <p class="text-[9px] font-bold text-gray-400 uppercase mt-1">Upload Photo</p>
+                  </template>
+                  <input type="file" ref="fileInput" class="hidden" @change="handleImageUpload">
+                </div>
+
+                <button @click="publishNews" class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-all shadow-lg shadow-blue-100">
+                  រក្សាទុកអត្ថបទ
+                </button>
               </div>
             </div>
+          </div>
 
-            <div class="divide-y divide-slate-100">
-              <div v-if="filteredNews.length === 0" class="py-32 text-center">
-                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="bi bi-inbox text-slate-300 text-2xl"></i>
-                </div>
-                <p class="font-bold text-xs uppercase tracking-widest text-slate-400">មិនមានទិន្នន័យត្រូវបានរកឃើញឡើយ</p>
-              </div>
-              
-              <div v-for="item in filteredNews" :key="item.id" 
-                   class="flex items-center gap-6 px-8 py-5 hover:bg-slate-50/80 transition-all group">
-                <div class="relative flex-shrink-0">
-                    <img :src="item.image" class="w-16 h-16 rounded-xl object-cover border border-slate-100 shadow-sm" />
-                    <span class="absolute -top-2 -left-2 px-1.5 py-0.5 bg-indigo-600 text-white text-[7px] font-black rounded uppercase">{{ item.badge }}</span>
-                </div>
-                
-                <div class="flex-grow min-w-0">
-                  <div class="flex items-center gap-3 mb-1.5">
-                    <span class="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-600 text-[9px] font-black uppercase tracking-tighter">{{ getKhmerCategory(item.category) }}</span>
-                    <span class="text-[10px] font-bold text-slate-400 flex items-center gap-1">
-                        <i class="bi bi-calendar4-event"></i> {{ item.date }}
-                    </span>
-                  </div>
-                  <h4 class="text-[15px] font-bold text-slate-700 truncate group-hover:text-indigo-600 transition-colors">{{ item.title }}</h4>
-                </div>
-                
-                <div class="flex items-center gap-4 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all">
-                  <button @click.stop="deleteNews(item.id)" 
-                    class="w-10 h-10 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all flex items-center justify-center">
-                    <i class="bi bi-trash3 text-lg"></i>
-                  </button>
+          <div class="xl:col-span-2">
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+              <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                  <thead class="bg-gray-50 text-gray-500 text-[10px] uppercase font-bold border-b border-gray-100">
+                    <tr>
+                      <th class="px-6 py-4">អត្ថបទ</th>
+                      <th class="px-4 py-4 text-center">ប្រភេទ</th>
+                      <th class="px-6 py-4 text-right">សកម្មភាព</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-100">
+                    <tr v-for="item in filteredTableData" :key="item.id" class="hover:bg-slate-50/50 transition-colors">
+                      <td class="px-6 py-4">
+                        <div class="flex items-center gap-4">
+                          <img :src="item.image" class="w-14 h-14 rounded-xl object-cover shadow-sm bg-gray-100 flex-shrink-0">
+                          <div class="min-w-0">
+                            <p class="text-sm font-bold text-slate-700 truncate mb-1">{{ item.title }}</p>
+                            <p class="text-[10px] text-gray-400 font-medium">
+                               <i class="bi bi-calendar3 mr-1"></i> {{ item.date }} 
+                               <span class="mx-2 text-gray-200">|</span> 
+                               <span class="text-blue-600 font-black uppercase">{{ item.badge }}</span>
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="px-4 py-4 text-center">
+                        <span class="text-[10px] font-bold bg-slate-100 text-slate-600 px-3 py-1 rounded-full border border-slate-200">
+                          {{ getKhmerCategory(item.category) }}
+                        </span>
+                      </td>
+                      <td class="px-6 py-4 text-right">
+                        <button @click="deleteNews(item.id)" class="w-9 h-9 flex items-center justify-center rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition-all">
+                          <i class="bi bi-trash3"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div v-if="filteredTableData.length === 0" class="py-24 text-center">
+                   <div class="text-gray-200 text-5xl mb-3"><i class="bi bi-inbox"></i></div>
+                   <p class="text-gray-400 text-sm font-medium tracking-wide">មិនទាន់មានទិន្នន័យនៅឡើយទេ</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
+
+    <div v-if="mobileMenuOpen" @click="mobileMenuOpen = false" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] lg:hidden"></div>
+    <div :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed left-0 top-0 h-full w-72 bg-slate-900 z-[70] transition-transform duration-300 lg:hidden p-6 text-white">
+       <div class="flex items-center gap-3 mb-10 pb-6 border-b border-white/10">
+          <img src="https://png.pngtree.com/png-vector/20220714/ourmid/pngtree-np-icon-vector-illustration-design-letter-monogram-alphabet-vector-png-image_37915324.png" class="w-8 h-8 rounded bg-white p-0.5">
+          <span class="font-bold">NP News Admin</span>
+       </div>
+       <nav class="space-y-4">
+          <button v-for="nav in tableTabs" :key="nav.id" 
+            @click="activeTableTab = nav.id; mobileMenuOpen = false" 
+            class="flex items-center justify-between w-full p-2 text-sm font-medium rounded-lg"
+            :class="activeTableTab === nav.id ? 'text-blue-400' : 'text-slate-400'">
+            <div class="flex items-center gap-3">
+              <i :class="getIconForCategory(nav.id)"></i> {{ nav.name }}
+            </div>
+            <span class="text-[10px]">{{ getCategoryCount(nav.id) }}</span>
+          </button>
+       </nav>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, watch, computed, onMounted } from 'vue';
+import { ref, reactive, computed } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
-const storageKey = 'app_news_data';
-const user = ref(null);
 const searchQuery = ref('');
+const activeTableTab = ref('All');
+const mobileMenuOpen = ref(false);
+const storageKey = 'app_news_data';
+const publishedNews = ref(JSON.parse(localStorage.getItem(storageKey) || '[]'));
+
+// Removed Home Category
+const tableTabs = [
+  { id: 'All', name: 'ទាំងអស់' },
+  { id: 'Popular', name: 'ពេញនិយម' },
+  { id: 'Entertainment', name: 'កម្សាន្ត' },
+  { id: 'Sports', name: 'កីឡា' },
+  { id: 'Tech', name: 'បច្ចេកវិទ្យា' },
+  { id: 'Society', name: 'សង្គម' }
+];
 
 const categoriesKhmer = [
-  { en: 'Home', kh: 'ទំព័រដើម' },
   { en: 'Popular', kh: 'ពេញនិយម' },
-  { en: 'Sports', kh: 'កីឡា' },
+  { en: 'Sports', kh: 'កីឡា' }, 
   { en: 'Tech', kh: 'បច្ចេកវិទ្យា' },
-  { en: 'Entertainment', kh: 'កម្សាន្ត' },
+  { en: 'Entertainment', kh: 'កម្សាន្ត' }, 
   { en: 'Society', kh: 'សង្គម' }
 ];
 
-const getKhmerCategory = (enName) => {
-  return categoriesKhmer.find(c => c.en === enName)?.kh || enName;
+const form = reactive({ category: 'Popular', badge: '', title: '', image: '' });
+
+const getCategoryCount = (id) => id === 'All' ? publishedNews.value.length : publishedNews.value.filter(i => i.category === id).length;
+const getKhmerCategory = (en) => categoriesKhmer.find(c => c.en === en)?.kh || en;
+const getIconForCategory = (id) => {
+  const icons = { 'All': 'bi-stack', 'Popular': 'bi-lightning-charge-fill', 'Entertainment': 'bi-camera-reels-fill', 'Sports': 'bi-trophy-fill', 'Tech': 'bi-cpu-fill', 'Society': 'bi-people-fill' };
+  return icons[id] || 'bi-bookmark-fill';
 };
 
-onMounted(() => {
-  const sessionUser = localStorage.getItem('np_news_user');
-  const isAdmin = localStorage.getItem('admin_status') === 'true';
-  if (!isAdmin || !sessionUser) {
-    router.push('/'); 
-  } else {
-    user.value = JSON.parse(sessionUser);
-  }
+const filteredTableData = computed(() => {
+  let list = publishedNews.value;
+  if (activeTableTab.value !== 'All') list = list.filter(item => item.category === activeTableTab.value);
+  if (searchQuery.value) list = list.filter(item => item.title.toLowerCase().includes(searchQuery.value.toLowerCase()));
+  return list;
 });
 
-const publishedNews = ref(JSON.parse(localStorage.getItem(storageKey) || '[]'));
-
-const form = reactive({
-  category: 'Home',
-  badge: '',
-  title: '',
-  image: ''
-});
-
-const stats = computed(() => [
-  { label: 'អត្ថបទសរុប', count: publishedNews.value.length, textColor: 'text-indigo-600', bgColor: 'bg-indigo-600' },
-  { label: 'ពេញនិយម', count: publishedNews.value.filter(n => n.category === 'Popular').length, textColor: 'text-rose-500', bgColor: 'bg-rose-500' },
-  { label: 'កម្សាន្ត', count: publishedNews.value.filter(n => n.category === 'Entertainment').length, textColor: 'text-pink-500', bgColor: 'bg-pink-500' },
-  { label: 'កីឡា', count: publishedNews.value.filter(n => n.category === 'Sports').length, textColor: 'text-emerald-500', bgColor: 'bg-emerald-500' },
-  { label: 'បច្ចេកវិទ្យា', count: publishedNews.value.filter(n => n.category === 'Tech').length, textColor: 'text-violet-500', bgColor: 'bg-violet-500' },
-  { label: 'សង្គម', count: publishedNews.value.filter(n => n.category === 'Society').length, textColor: 'text-amber-500', bgColor: 'bg-amber-500' },
-]);
-
-const filteredNews = computed(() => {
-  if (!searchQuery.value) return publishedNews.value;
-  const q = searchQuery.value.toLowerCase();
-  return publishedNews.value.filter(n => 
-    n.title.toLowerCase().includes(q) ||
-    n.category.toLowerCase().includes(q)
-  );
-});
-
-watch(publishedNews, (val) => {
-  localStorage.setItem(storageKey, JSON.stringify(val));
-}, { deep: true });
-
-// មុខងារបង្រួមរូបភាព (Image Compression) ដើម្បីឱ្យប្រើបានគ្រប់ប្រភេទរូបភាព និងមិនលើសទំហំ LocalStorage
 const handleImageUpload = (event) => {
   const file = event.target.files[0];
   if (!file) return;
-
   const reader = new FileReader();
   reader.onload = (e) => {
     const img = new Image();
     img.onload = () => {
       const canvas = document.createElement('canvas');
-      const MAX_WIDTH = 800; // កំណត់ទំហំទទឹងអតិបរមា 800px
-      const scaleSize = MAX_WIDTH / img.width;
-      canvas.width = MAX_WIDTH;
-      canvas.height = img.height * scaleSize;
-
+      canvas.width = 600;
+      canvas.height = (img.height * 600) / img.width;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-      // បម្លែងទៅជា WebP ឬ JPEG ដើម្បីបន្ថយទំហំឯកសារ
-      form.image = canvas.toDataURL('image/jpeg', 0.7); // គុណភាព 70%
+      form.image = canvas.toDataURL('image/jpeg', 0.6);
     };
     img.src = e.target.result;
   };
@@ -245,47 +275,27 @@ const handleImageUpload = (event) => {
 };
 
 const publishNews = () => {
-  if (!form.title || !form.image) return alert("សូមបំពេញចំណងជើង និងជ្រើសរើសរូបភាព!");
-  
-  try {
-    const newArticle = {
-      id: Date.now(),
-      category: form.category,
-      badge: form.badge.toUpperCase() || 'ព័ត៌មាន',
-      title: form.title,
-      date: new Date().toLocaleDateString('km-KH', { day: 'numeric', month: 'long', year: 'numeric' }),
-      image: form.image
-    };
-
-    publishedNews.value.unshift(newArticle);
-    form.title = ''; form.image = ''; form.badge = '';
-  } catch (e) {
-    alert("បញ្ហា៖ មិនអាចរក្សាទុកបានឡើយ (ប្រហែលជាទំហំរូបភាពធំពេក)។ សូមព្យាយាមជាមួយរូបភាពផ្សេង!");
-  }
+  if (!form.title || !form.image) return alert("សូមបំពេញទិន្នន័យ");
+  const newArticle = { id: Date.now(), category: form.category, badge: form.badge || 'INFO', title: form.title, date: new Date().toLocaleDateString('km-KH'), image: form.image };
+  publishedNews.value.unshift(newArticle);
+  localStorage.setItem(storageKey, JSON.stringify(publishedNews.value));
+  form.title = ''; form.image = '';
 };
 
 const deleteNews = (id) => {
-  const index = publishedNews.value.findIndex(item => item.id === id);
-  if (index !== -1) {
-    if (confirm("តើអ្នកពិតជាចង់លុបអត្ថបទនេះជាអចិន្ត្រៃយ៍មែនទេ?")) {
-      publishedNews.value.splice(index, 1);
-    }
+  if (confirm("តើអ្នកប្រាកដជាចង់លុបអត្ថបទនេះ?")) {
+    publishedNews.value = publishedNews.value.filter(i => i.id !== id);
+    localStorage.setItem(storageKey, JSON.stringify(publishedNews.value));
   }
 };
 
 const handleLogout = () => {
   localStorage.removeItem('admin_status');
-  localStorage.removeItem('np_news_user');
   router.push('/');
 };
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;700&display=swap');
 .font-khmer { font-family: 'Khmer OS Battambang', sans-serif; }
-
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #f1f1f1; }
-::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
 </style>
