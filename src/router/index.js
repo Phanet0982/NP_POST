@@ -8,6 +8,8 @@ import Tech from "../views/Technology.vue";
 import Entertainment from "../views/Entertainment.vue";
 import Society from "../views/Society.vue";
 import Management from "../dashboard/Management.vue";
+// Ensure you have created this file in your views folder
+import NewsDetail from "../views/NewsDetail.vue";
 
 const routes = [
   {
@@ -46,12 +48,18 @@ const routes = [
     component: Society,
     meta: { label: "សង្គម" },
   },
+  // --- ADDED THIS DYNAMIC ROUTE FOR SEARCH NAVIGATION ---
+  {
+    path: "/news/:id",
+    name: "NewsDetail",
+    component: NewsDetail,
+    meta: { label: "ព័ត៌មានលម្អិត" },
+  },
   {
     path: "/management",
     name: "Management",
     component: Management,
-    // Add meta requiresAuth to protect this route
-    meta: { label: "Admin Dashboard", requiresAuth: true }, 
+    meta: { label: "Admin Dashboard", requiresAuth: true },
   },
 ];
 
@@ -62,6 +70,7 @@ const router = createRouter({
     if (savedPosition) {
       return savedPosition;
     } else {
+      // Force scroll to top when clicking from search
       return { top: 0, behavior: "smooth" };
     }
   },
@@ -69,19 +78,18 @@ const router = createRouter({
 
 // --- GLOBAL SECURITY GUARD ---
 router.beforeEach((to, from, next) => {
-  const isAdmin = localStorage.getItem('admin_status') === 'true';
-  const isLoggedIn = localStorage.getItem('np_news_user') !== null;
+  const isAdmin = localStorage.getItem("admin_status") === "true";
+  const isLoggedIn = localStorage.getItem("np_news_user") !== null;
 
-  // Check if the route requires authentication
   if (to.meta.requiresAuth) {
     if (isLoggedIn && isAdmin) {
-      next(); // User is Admin, allow access
+      next();
     } else {
       alert("សូមចូលប្រើប្រាស់ជា Admin ជាមុនសិន!");
-      next('/'); // Kick back to home page
+      next("/");
     }
   } else {
-    next(); // Public route, always allow
+    next();
   }
 });
 

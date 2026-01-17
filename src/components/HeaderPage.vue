@@ -24,12 +24,41 @@
           <i class="bi bi-list fs-4"></i>
         </button>
         
-        <div class="search-wrapper d-none d-lg-block">
-          <div class="input-group input-group-sm">
-            <span class="input-group-text bg-light border-0"><i class="bi bi-search"></i></span>
-            <input type="text" class="form-control bg-light border-0" placeholder="ស្វែងរកព័ត៌មាន...">
-          </div>
+<div class="search-wrapper d-none d-lg-block">
+  <div class="input-group input-group-sm search-box">
+    <span class="input-group-text bg-light border-0"><i class="bi bi-search text-primary"></i></span>
+    <input 
+      v-model="searchQuery" 
+      @input="handleSearch"
+      @focus="isFocused = true"
+      type="text" 
+      class="form-control bg-light border-0 shadow-none" 
+      placeholder="ស្វែងរកអត្ថបទព័ត៌មាន..."
+    >
+  </div>
+  
+  <div v-if="searchQuery && isFocused" class="search-results-dropdown shadow-lg">
+    <div class="dropdown-header-custom">
+      <span>លទ្ធផលស្វែងរក</span>
+      <span class="badge bg-primary-subtle text-primary">{{ searchResults.length }}</span>
+    </div>
+
+    <div v-if="searchResults.length > 0">
+      <div v-for="item in searchResults" :key="item.id" @click="goToArticle(item)" class="search-result-item">
+        <img :src="item.image" class="result-img">
+        <div class="result-info">
+          <div class="result-title text-truncate">{{ item.title }}</div>
+          <small class="text-primary fw-bold">{{ item.category }} • {{ item.date }}</small>
         </div>
+        <i class="bi bi-chevron-right ms-auto text-muted small"></i>
+      </div>
+    </div>
+
+    <div v-else class="p-4 text-center">
+      <p class="text-muted small mb-0">មិនឃើញមានទិន្នន័យសម្រាប់ "{{ searchQuery }}"</p>
+    </div>
+  </div>
+</div>
       </div>
 
       <div class="text-center d-lg-none flex-grow-1">
@@ -62,16 +91,35 @@
                    class="rounded-circle border border-2 border-primary p-0.5 cursor-pointer profile-img shadow-sm" 
                    alt="Profile">
               <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2 p-2" :class="{ show: showDropdown }">
-                <li><div class="dropdown-header text-dark fw-bold d-md-none border-bottom mb-1">{{ user.name }}</div></li>
-                <li v-if="user.role === 'admin'">
-                   <router-link to="/management" class="dropdown-item rounded-2 text-primary fw-bold mb-1">
-                    <i class="bi bi-speedometer2 me-2"></i>គ្រប់គ្រងអត្ថបទ
-                   </router-link>
-                </li>
-                <li><a class="dropdown-item rounded-2" href="#"><i class="bi bi-person me-2"></i>គណនីរបស់ខ្ញុំ</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><button class="dropdown-item rounded-2 text-danger" @click="handleLogout"><i class="bi bi-box-arrow-right me-2"></i>ចាកចេញ</button></li>
-              </ul>
+  <li class="d-md-none">
+    <div class="dropdown-header text-dark fw-bold border-bottom pb-2 mb-2">
+      {{ user.name }}
+    </div>
+  </li>
+  
+  <li v-if="user.role === 'admin'">
+    <router-link to="/management" class="dropdown-item rounded-2 text-primary fw-bold">
+      <i class="bi bi-speedometer2"></i>
+      <span>គ្រប់គ្រងអត្ថបទ</span>
+    </router-link>
+  </li>
+  
+  <li>
+    <a class="dropdown-item rounded-2" href="#">
+      <i class="bi bi-person"></i>
+      <span>គណនីរបស់ខ្ញុំ</span>
+    </a>
+  </li>
+  
+  <li><hr class="dropdown-divider"></li>
+  
+  <li>
+    <button class="dropdown-item rounded-2 text-danger" @click="handleLogout">
+      <i class="bi bi-box-arrow-right"></i>
+      <span>ចាកចេញ</span>
+    </button>
+  </li>
+</ul>
             </div>
           </div>
         </template>
@@ -118,34 +166,79 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, onUnmounted, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 
+// --- CONFIG & ROUTING ---
 const router = useRouter();
 const currentDate = new Date().toLocaleDateString('km-KH', { day: 'numeric', month: 'long', year: 'numeric' });
+
+// --- AUTH STATE ---
 const user = ref(null);
 const showDropdown = ref(false);
 const showModal = ref(false);
 const authMode = ref('login');
 const authForm = reactive({ name: '', email: '', password: '' });
 
-// MASTER CREDENTIALS
 const MASTER_EMAIL = 'admin@gmail.com';
 const MASTER_PASS = 'admin12345';
 
+// --- SEARCH STATE ---
+const searchQuery = ref('');
+const searchResults = ref([]);
+const isFocused = ref(false);
+
+// --- LIFECYCLE HOOKS ---
 onMounted(() => {
   const savedUser = localStorage.getItem('np_news_user');
   if (savedUser) user.value = JSON.parse(savedUser);
-  window.addEventListener('click', () => (showDropdown.value = false));
+  
+  // Close dropdowns when clicking anywhere outside
+  window.addEventListener('click', handleGlobalClick);
 });
 
+onUnmounted(() => {
+  window.removeEventListener('click', handleGlobalClick);
+});
+
+// --- SEARCH LOGIC ---
+const handleSearch = () => {
+  if (!searchQuery.value.trim()) {
+    searchResults.value = [];
+    return;
+  }
+
+  // Use the correct key: app_news_data
+  const allNews = JSON.parse(localStorage.getItem('app_news_data') || '[]');
+  const query = searchQuery.value.toLowerCase();
+  
+  searchResults.value = allNews.filter(item => 
+    item.title.toLowerCase().includes(query) || 
+    item.category.toLowerCase().includes(query)
+  ).slice(0, 5);
+};
+
+const goToArticle = async (item) => {
+  // Clear search state first to avoid UI flickering
+  const targetId = item.id;
+  searchQuery.value = '';
+  isFocused.value = false;
+  searchResults.value = [];
+
+  // Wait for DOM updates then navigate
+  await nextTick();
+  router.push(`/news/${targetId}`).catch(err => {
+    console.error("Navigation failed:", err);
+  });
+};
+
+// --- AUTH LOGIC ---
 const openAuthModal = (mode) => {
   authMode.value = mode;
   showModal.value = true;
 };
 
 const handleAuthSubmit = () => {
-  // 1. Check Master Admin First
   if (authForm.email === MASTER_EMAIL && authForm.password === MASTER_PASS) {
     const adminUser = {
       name: 'NP Administrator',
@@ -153,15 +246,11 @@ const handleAuthSubmit = () => {
       role: 'admin',
       avatar: `https://ui-avatars.com/api/?name=Admin&background=0D6EFD&color=fff&bold=true`
     };
-    user.value = adminUser;
-    localStorage.setItem('np_news_user', JSON.stringify(adminUser));
-    localStorage.setItem('admin_status', 'true');
-    showModal.value = false;
+    loginUser(adminUser, true);
     router.push('/management');
     return;
   }
 
-  // 2. Regular Auth Logic
   if (authMode.value === 'login') {
     const storedUser = localStorage.getItem(`user_${authForm.email}`);
     if (storedUser) {
@@ -173,21 +262,23 @@ const handleAuthSubmit = () => {
           role: parsedUser.email.includes('admin') ? 'admin' : 'user',
           avatar: `https://ui-avatars.com/api/?name=${parsedUser.name}&background=6c757d&color=fff`
         };
-        user.value = sessionUser;
-        localStorage.setItem('np_news_user', JSON.stringify(sessionUser));
-        if (sessionUser.role === 'admin') localStorage.setItem('admin_status', 'true');
-        showModal.value = false;
+        loginUser(sessionUser, sessionUser.role === 'admin');
         return;
       }
     }
     alert('អុីមែល ឬលេខសម្ងាត់មិនត្រឹមត្រូវ!');
   } else {
-    // Registration logic
-    const userData = { ...authForm };
-    localStorage.setItem(`user_${authForm.email}`, JSON.stringify(userData));
+    localStorage.setItem(`user_${authForm.email}`, JSON.stringify({ ...authForm }));
     alert('ចុះឈ្មោះជោគជ័យ! សូមចូលប្រើប្រាស់។');
     authMode.value = 'login';
   }
+};
+
+const loginUser = (userData, isAdmin) => {
+  user.value = userData;
+  localStorage.setItem('np_news_user', JSON.stringify(userData));
+  if (isAdmin) localStorage.setItem('admin_status', 'true');
+  showModal.value = false;
 };
 
 const handleLogout = () => {
@@ -198,13 +289,25 @@ const handleLogout = () => {
   router.push('/');
 };
 
+// --- UI HELPERS ---
 const toggleDropdown = () => (showDropdown.value = !showDropdown.value);
+
+const handleGlobalClick = (e) => {
+  // 1. Close profile dropdown
+  if (!e.target.closest('.profile-img')) {
+    showDropdown.value = false;
+  }
+  // 2. Close search results (Ensure we don't close if clicking a result)
+  if (!e.target.closest('.search-wrapper')) {
+    isFocused.value = false;
+  }
+};
 </script>
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;700;900&display=swap');
 
-.font-khmer { font-family: 'Kantumruy Pro', sans-serif; }
+.font-khmer { font-family: 'Khmer OS Battambang', sans-serif; }
 .header-main { height: 75px; }
 .brand-logo { height: 50px; width: 50px; object-fit: contain; transition: transform 0.3s; }
 .brand-logo:hover { transform: scale(1.1); }
@@ -242,6 +345,116 @@ const toggleDropdown = () => (showDropdown.value = !showDropdown.value);
   100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
 }
 
-.dropdown-menu { display: none; }
-.dropdown-menu.show { display: block; }
+/* Improve the dropdown appearance */
+.dropdown-menu {
+  min-width: 220px; /* Give it enough width so text doesn't wrap */
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.05) !important;
+  padding: 8px !important;
+  right: 0; /* Ensures it aligns to the right edge of the avatar */
+}
+
+.dropdown-item {
+  padding: 10px 15px;
+  display: flex;
+  align-items: center;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+}
+
+.dropdown-item i {
+  font-size: 1.2rem;
+  width: 25px; /* Fixed width for icons so text aligns vertically */
+  margin-right: 12px;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+  color: #0d6efd;
+}
+
+.text-danger:hover {
+  background-color: #fff5f5;
+  color: #dc3545 !important;
+}
+
+.search-wrapper {
+  position: relative;
+  width: 320px;
+  z-index: 1050;
+}
+
+.search-box {
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.search-box:focus-within {
+  border-color: #0d6efd;
+  background: white;
+}
+
+.search-results-dropdown {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #edf2f7;
+  animation: slideIn 0.2s ease-out;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-header-custom {
+  padding: 10px 15px;
+  background: #f8fafc;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  cursor: pointer;
+  transition: background 0.2s;
+  border-bottom: 1px solid #f8fafc;
+}
+
+.search-result-item:hover {
+  background: #f0f7ff;
+}
+
+.result-img {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-right: 12px;
+}
+
+.result-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1e293b;
+  line-height: 1.4;
+}
+
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 </style>
