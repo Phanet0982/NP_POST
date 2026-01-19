@@ -8,8 +8,7 @@ import Tech from "../views/Technology.vue";
 import Entertainment from "../views/Entertainment.vue";
 import Society from "../views/Society.vue";
 import Management from "../dashboard/Management.vue";
-// Ensure you have created this file in your views folder
-import NewsDetail from "../views/NewsDetail.vue";
+import NewsDetail from "../views/NewsDetail.vue"; // Your Detail File
 
 const routes = [
   {
@@ -48,13 +47,17 @@ const routes = [
     component: Society,
     meta: { label: "សង្គម" },
   },
-  // --- ADDED THIS DYNAMIC ROUTE FOR SEARCH NAVIGATION ---
+
+  // --- DYNAMIC ROUTE FOR NEWS DETAILS ---
   {
     path: "/news/:id",
     name: "NewsDetail",
     component: NewsDetail,
     meta: { label: "ព័ត៌មានលម្អិត" },
+    // This allows the component to receive the ID as a prop directly
+    props: true,
   },
+
   {
     path: "/management",
     name: "Management",
@@ -67,12 +70,11 @@ const router = createRouter({
   history: createWebHashHistory(),
   routes,
   scrollBehavior(to, from, savedPosition) {
-    if (savedPosition) {
-      return savedPosition;
-    } else {
-      // Force scroll to top when clicking from search
+    // If we are moving to a news detail page, always jump to top
+    if (to.name === "NewsDetail") {
       return { top: 0, behavior: "smooth" };
     }
+    return savedPosition || { top: 0 };
   },
 });
 

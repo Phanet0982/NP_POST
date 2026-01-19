@@ -25,7 +25,7 @@
         </div>
 
         <nav class="space-y-1">
-          <p class="px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Menu</p>
+          <p class="px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">ប្រភេទព័ត៌មាន</p>
           <button v-for="nav in tableTabs" :key="nav.id"
             @click="activeTableTab = nav.id; mobileMenuOpen = false"
             :class="activeTableTab === nav.id ? 'bg-blue-50 text-blue-600' : 'text-slate-500 hover:bg-gray-50'"
@@ -34,7 +34,7 @@
               <i :class="getIconForCategory(nav.id)" class="text-base"></i>
               <span class="text-sm font-medium">{{ nav.name }}</span>
             </div>
-            <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-gray-100 shadow-sm opacity-80">
+            <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-gray-100 shadow-sm">
               {{ getCategoryCount(nav.id) }}
             </span>
           </button>
@@ -42,221 +42,199 @@
       </div>
 
       <div class="mt-auto p-4 border-t border-gray-100 bg-gray-50/50">
-        <div class="flex items-center gap-3 p-2 mb-3">
-          <img src="https://ui-avatars.com/api/?name=Admin&background=0066FF&color=fff" class="w-10 h-10 rounded-xl border-2 border-white shadow-sm">
-          <div class="overflow-hidden">
-            <p class="text-sm font-bold text-slate-900 truncate">Administrator</p>
-            <div class="flex items-center gap-1.5">
-              <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-              <p class="text-[11px] text-slate-500 font-medium">Online</p>
-            </div>
-          </div>
-        </div>
-        <button @click="handleLogout" class="w-full py-2.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 border border-transparent hover:border-red-100">
+        <button @click="handleLogout" class="w-full py-2.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
           <i class="bi bi-box-arrow-right"></i> ចាកចេញ
         </button>
       </div>
     </aside>
 
-    <div v-if="mobileMenuOpen" @click="mobileMenuOpen = false" class="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-40 lg:hidden"></div>
-
     <div class="flex-1 flex flex-col min-w-0">
-      <header class="hidden lg:flex bg-white/80 backdrop-blur-md border-b border-gray-200 px-8 h-16 items-center justify-between sticky top-0 z-30">
-        <h4 class="font-bold text-slate-800 flex items-center gap-2">
-          Dashboard <i class="bi bi-chevron-right text-[10px] text-gray-400"></i> <span class="text-blue-600">Analytics & Content</span>
-        </h4>
+      
+      <header class="bg-white border-b border-gray-100 h-20 sticky top-0 z-30 hidden lg:flex items-center justify-between px-8">
+        <div class="flex items-center gap-4">
+          <div>
+            <h2 class="text-sm font-bold text-slate-800">ផ្ទាំងគ្រប់គ្រងទិន្នន័យ</h2>
+            <div class="flex items-center gap-2 text-[10px] text-slate-400 font-medium">
+              <span>ទំព័រដើម</span>
+              <i class="bi bi-chevron-right text-[8px]"></i>
+              <span class="text-blue-600 font-bold">{{ activeTableTab === 'All' ? 'អត្ថបទទាំងអស់' : getKhmerCategory(activeTableTab) }}</span>
+            </div>
+          </div>
+        </div>
 
-        <div class="relative group">
-          <i class="bi bi-search absolute left-3 top-8 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors"></i>
-          <input v-model="searchQuery" type="text" placeholder="ស្វែងរកអត្ថបទ..." 
-            class="w-80 pl-10 pr-4 py-2 bg-gray-50 border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all outline-none border">
+        <div class="flex items-center gap-6">
+          <div class="hidden xl:flex flex-col items-end border-r pr-6 border-gray-100">
+            <span class="text-xs font-bold text-slate-700">{{ currentTime }}</span>
+            <span class="text-[10px] text-slate-400">កាលបរិច្ឆេទថ្ងៃនេះ</span>
+          </div>
+
+          <button class="relative p-2.5 text-slate-400 hover:bg-slate-50 rounded-xl transition-colors">
+            <i class="bi bi-bell text-xl"></i>
+            <span class="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 border-2 border-white rounded-full"></span>
+          </button>
+
+          <div class="flex items-center gap-4 pl-6 border-l border-gray-100 relative profile-trigger">
+            <div class="text-right hidden sm:block">
+              <p class="text-[13px] font-black text-slate-800 leading-tight mb-0.5">Admin User</p>
+              <div class="flex items-center justify-end gap-1.5">
+                <span class="flex h-2 w-2 relative">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
+                </span>
+                <p class="text-[10px] text-green-600 font-black uppercase tracking-widest">អនឡាញ</p>
+              </div>
+            </div>
+
+            <button @click="userMenuOpen = !userMenuOpen" 
+              class="group relative w-12 h-12 rounded-2xl bg-white p-1 shadow-sm border border-slate-100 transition-all hover:shadow-md hover:border-blue-200">
+              <div class="w-full h-full rounded-[12px] bg-gradient-to-tr from-slate-100 to-slate-200 flex items-center justify-center text-slate-400 overflow-hidden">
+                <i class="bi bi-person-fill text-2xl transition-transform group-hover:scale-110"></i>
+              </div>
+            </button>
+
+            <transition name="fade-slide">
+              <div v-if="userMenuOpen" class="absolute top-full right-0 mt-3 w-60 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50">
+                <div class="px-4 py-3 border-b border-gray-50 mb-1">
+                  <p class="text-[10px] font-bold text-slate-400 mb-1">គណនីគ្រប់គ្រង</p>
+                  <p class="text-xs font-bold text-slate-700 truncate">admin@gmail.com</p>
+                </div>
+                <button class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition-colors text-left font-medium">
+                  <i class="bi bi-person-circle text-base"></i> ព័ត៌មានផ្ទាល់ខ្លួន
+                </button>
+                <button class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition-colors text-left font-medium">
+                  <i class="bi bi-gear text-base"></i> ការកំណត់
+                </button>
+                <div class="h-px bg-gray-50 my-1"></div>
+                <button @click="handleLogout" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors text-left font-bold">
+                  <i class="bi bi-box-arrow-right text-base"></i> ចាកចេញពីប្រព័ន្ធ
+                </button>
+              </div>
+            </transition>
+          </div>
         </div>
       </header>
 
       <main class="p-4 lg:p-8 space-y-8 max-w-[1600px] mx-auto w-full">
-        
         <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
           <div v-for="tab in tableTabs" :key="tab.id" @click="activeTableTab = tab.id"
-              :class="activeTableTab === tab.id ? 'ring-2 ring-blue-500 bg-white shadow-xl shadow-blue-900/5 translate-y-[-4px]' : 'bg-white border-gray-100 hover:border-blue-200'"
-              class="p-4 rounded-2xl border cursor-pointer transition-all duration-300 group">
-            <div class="flex items-center justify-between mb-3">
-              <div :class="activeTableTab === tab.id ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500 group-hover:bg-blue-50 group-hover:text-blue-600'" 
-                  class="w-10 h-10 rounded-xl flex items-center justify-center transition-colors">
-                <i :class="getIconForCategory(tab.id)" class="text-lg"></i>
+              :class="activeTableTab === tab.id ? 'ring-2 ring-blue-500 bg-white shadow-lg' : 'bg-white border-gray-100 hover:border-blue-200'"
+              class="p-4 rounded-2xl border cursor-pointer transition-all duration-300">
+            <div class="flex items-center justify-between mb-2">
+              <div :class="activeTableTab === tab.id ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500'" class="w-9 h-9 rounded-lg flex items-center justify-center">
+                <i :class="getIconForCategory(tab.id)"></i>
               </div>
-              <span class="text-xl font-black text-slate-800">{{ getCategoryCount(tab.id) }}</span>
+              <span class="text-lg font-black">{{ getCategoryCount(tab.id) }}</span>
             </div>
-            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{{ tab.name }}</p>
+            <p class="text-[10px] font-bold text-slate-400">{{ tab.name }}</p>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
-          
-          <div class="xl:col-span-1">
-            <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm sticky top-24">
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
+          <div class="xl:col-span-4">
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm sticky top-28">
               <div class="flex items-center gap-3 mb-6">
-                <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                  <i class="bi bi-plus-circle-fill text-xl"></i>
+                <div :class="isEditing ? 'bg-amber-50 text-amber-600' : 'bg-blue-50 text-blue-600'" class="w-12 h-12 rounded-2xl flex items-center justify-center transition-colors">
+                  <i :class="isEditing ? 'bi bi-pencil-square' : 'bi bi-plus-lg'" class="text-xl"></i>
                 </div>
-                <h3 class="font-bold text-slate-800">បញ្ចូលព័ត៌មានថ្មី</h3>
+                <div>
+                  <h3 class="font-bold text-slate-800 text-lg">{{ isEditing ? 'កែប្រែអត្ថបទ' : 'អត្ថបទថ្មី' }}</h3>
+                  <p class="text-xs text-slate-400">{{ isEditing ? 'កំពុងកែប្រែទិន្នន័យចាស់' : 'បញ្ចូលព័ត៌មានទៅក្នុងប្រព័ន្ធ' }}</p>
+                </div>
               </div>
               
-              <div class="space-y-5">
-                <div>
-                  <label class="block text-[11px] font-bold text-slate-400 mb-2 uppercase tracking-wider">ចំណងជើង</label>
-                  <input v-model="form.title" type="text" class="w-full px-4 py-2.5 bg-slate-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-50 outline-none transition-all" placeholder="ចំណងជើងអត្ថបទ">
-                </div>
-
-                <div>
-                  <label class="block text-[11px] font-bold text-slate-400 mb-2 uppercase tracking-wider">ខ្លឹមសារ</label>
-                  <textarea v-model="form.content" rows="4" class="w-full px-4 py-2.5 bg-slate-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-50 outline-none transition-all resize-none" placeholder="សរសេរខ្លឹមសារ..."></textarea>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                  <div>
-                    <label class="block text-[11px] font-bold text-slate-400 mb-2 uppercase tracking-wider">ប្រភេទ</label>
-                    <select v-model="form.category" class="w-full px-3 py-2.5 bg-slate-50 border border-gray-200 rounded-xl text-sm focus:bg-white outline-none appearance-none">
-                      <option v-for="cat in categoriesKhmer" :key="cat.en" :value="cat.en">{{ cat.kh }}</option>
-                    </select>
+              <div class="space-y-4">
+                <div @click="$refs.fileInput.click()" class="relative aspect-video rounded-2xl border-2 border-dashed border-slate-200 overflow-hidden bg-slate-50 cursor-pointer hover:border-blue-400 transition-all group">
+                  <img v-if="form.image" :src="form.image" class="w-full h-full object-cover">
+                  <div v-else class="absolute inset-0 flex flex-col items-center justify-center text-slate-400">
+                    <i class="bi bi-image text-3xl mb-2"></i>
+                    <span class="text-xs font-bold">ជ្រើសរើសរូបភាពក្រប</span>
                   </div>
-                  <div>
-                    <label class="block text-[11px] font-bold text-slate-400 mb-2 uppercase tracking-wider">អ្នកនិពន្ធ</label>
-                    <input v-model="form.author" class="w-full px-3 py-2.5 bg-slate-50 border border-gray-200 rounded-xl text-sm focus:bg-white outline-none" placeholder="ឈ្មោះ...">
-                  </div>
+                  <input type="file" ref="fileInput" class="hidden" @change="handleImageUpload" accept="image/*">
                 </div>
 
-                <div @click="$refs.fileInput.click()" class="border-2 border-dashed border-slate-200 rounded-2xl h-40 flex flex-col items-center justify-center cursor-pointer hover:bg-blue-50/50 hover:border-blue-300 transition-all relative overflow-hidden group">
-                  <img v-if="form.image" :src="form.image" class="absolute inset-0 w-full h-full object-cover">
-                  <div v-else class="text-center p-4">
-                    <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
-                      <i class="bi bi-cloud-arrow-up text-2xl text-slate-400"></i>
-                    </div>
-                    <p class="text-xs font-bold text-slate-500">បញ្ចូលរូបភាពក្រប</p>
-                    <p class="text-[10px] text-slate-400 mt-1">JPG, PNG format (Max 2MB)</p>
-                  </div>
-                  <input type="file" ref="fileInput" class="hidden" @change="handleImageUpload">
+                <input v-model="form.title" type="text" placeholder="ចំណងជើង..." class="w-full px-4 py-3 bg-slate-50 border border-transparent rounded-xl focus:bg-white focus:border-blue-500 outline-none transition-all font-bold">
+                <textarea v-model="form.content" rows="4" placeholder="ខ្លឹមសារអត្ថបទ..." class="w-full px-4 py-3 bg-slate-50 border border-transparent rounded-xl focus:bg-white focus:border-blue-500 outline-none transition-all resize-none text-sm"></textarea>
+
+                <div class="grid grid-cols-2 gap-3">
+                  <select v-model="form.category" class="px-3 py-3 bg-slate-50 rounded-xl text-sm outline-none border border-transparent focus:border-blue-500">
+                    <option v-for="cat in categoriesKhmer" :key="cat.en" :value="cat.en">{{ cat.kh }}</option>
+                  </select>
+                  <input v-model="form.author" type="text" placeholder="អ្នកនិពន្ធ..." class="px-3 py-3 bg-slate-50 rounded-xl text-sm outline-none border border-transparent focus:border-blue-500 font-bold">
                 </div>
 
-                <button @click="publishNews" class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-all shadow-lg shadow-blue-200 flex items-center justify-center gap-2 active:scale-[0.98]">
-                  <i class="bi bi-check2-circle text-lg"></i> រក្សាទុកអត្ថបទ
-                </button>
+                <div class="flex gap-2 pt-2">
+                  <button v-if="isEditing" @click="resetForm" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold text-sm transition-all">បោះបង់</button>
+                  <button @click="publishNews" :class="isEditing ? 'bg-amber-500 hover:bg-amber-600' : 'bg-blue-600 hover:bg-blue-700'" class="flex-[2] py-3 text-white rounded-xl font-bold text-sm transition-all shadow-lg flex items-center justify-center gap-2">
+                    {{ isEditing ? 'ធ្វើបច្ចុប្បន្នភាព' : 'រក្សាទុក' }}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
 
-          <div class="xl:col-span-2 space-y-8">
-            
-            <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm max-w-4xl mx-auto">
-              <div class="flex justify-between items-center mb-8">
+          <div class="xl:col-span-8">
+            <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+              <div class="p-6 border-b border-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                  <h3 class="font-bold text-slate-800 text-lg">និន្នាការនៃការចុះអត្ថបទ</h3>
-                  <p class="text-xs text-slate-400">ទិន្នន័យសរុបក្នុងរយៈពេល ៧ ថ្ងៃចុងក្រោយ</p>
+                  <h3 class="font-bold text-slate-800 text-lg">បញ្ជីអត្ថបទ</h3>
+                  <p class="text-xs text-slate-400">គ្រប់គ្រង និងកែប្រែព័ត៌មានរបស់អ្នក</p>
                 </div>
-                <div class="flex items-center gap-2">
-                  <span class="flex h-2 w-2 rounded-full bg-blue-500 animate-ping"></span>
-                  <span class="text-[10px] font-bold text-blue-600 tracking-widest uppercase">Live Status</span>
-                </div>
-              </div>
-
-              <div class="h-64 relative w-full group">
-                <div class="absolute inset-0 flex flex-col justify-between pointer-events-none">
-                  <div class="text-[10px] text-slate-300 w-full border-t border-gray-50 flex justify-end pr-2 pt-1">សកម្មខ្លាំង</div>
-                  <div class="text-[10px] text-slate-300 w-full border-t border-gray-50 flex justify-end pr-2 pt-1">មធ្យម</div>
-                  <div class="text-[10px] text-slate-300 w-full border-t border-gray-50 flex justify-end pr-2 pt-1">ទាប</div>
-                  <div class="w-full border-t border-slate-200"></div>
-                </div>
-
-                <svg class="w-full h-full" viewBox="0 0 1000 200" preserveAspectRatio="none">
-                  <defs>
-                    <linearGradient id="newsGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stop-color="#2563eb" stop-opacity="0.3" />
-                      <stop offset="100%" stop-color="#2563eb" stop-opacity="0" />
-                    </linearGradient>
-                  </defs>
-
-                  <path :d="chartPath.areaPath" fill="url(#newsGradient)" class="transition-all duration-700 ease-in-out" />
-                  
-                  <path :d="chartPath.linePath" fill="none" stroke="#2563eb" stroke-width="3" stroke-linejoin="round" class="transition-all duration-700 ease-in-out" />
-
-                  <circle v-for="(p, i) in chartPath.points" :key="i" 
-                          :cx="p.x" :cy="p.y" r="5" 
-                          fill="white" stroke="#2563eb" stroke-width="3" 
-                          class="transition-all duration-700" />
-                </svg>
-
-                <div class="flex justify-between mt-4 px-1 text-[9px] font-bold text-slate-400">
-                  <span v-for="label in chartLabels" :key="label">{{ label }}</span>
+                <div class="relative">
+                  <i class="bi bi-search absolute left-4 top-8 -translate-y-1/2 text-slate-400"></i>
+                  <input v-model="searchQuery" type="text" placeholder="ស្វែងរកតាមចំណងជើង..." 
+                    class="w-full md:w-80 pl-11 pr-4 py-2.5 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-blue-100 transition-all outline-none">
                 </div>
               </div>
 
-              <div class="flex flex-wrap justify-center gap-6 mt-12">
-                <div class="flex items-center gap-2">
-                  <span class="w-3 h-3 rounded-sm bg-blue-600"></span>
-                  <span class="text-[11px] font-bold text-slate-600 uppercase tracking-tight">ចំនួនអត្ថបទដែលបានចុះផ្សាយ</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-              <div class="px-6 py-5 border-b border-gray-50 flex items-center justify-between">
-                <div>
-                  <h3 class="font-bold text-slate-800">បញ្ជីអត្ថបទដែលបានបញ្ចេញ</h3>
-                  <p class="text-[11px] text-slate-400 font-medium">បង្ហាញចំនួន {{ filteredTableData.length }} អត្ថបទ</p>
-                </div>
-                <div class="flex gap-2">
-                  <button class="p-2 text-slate-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"><i class="bi bi-filter"></i></button>
-                  <button class="p-2 text-slate-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"><i class="bi bi-download"></i></button>
-                </div>
-              </div>
-              
               <div class="overflow-x-auto">
-                <table class="w-full">
-                  <thead class="bg-slate-50/50 text-slate-400 text-[10px] uppercase border-b border-gray-50">
+                <table class="w-full text-left">
+                  <thead class="bg-slate-50/50 text-[10px] uppercase font-bold text-slate-400 border-b border-gray-50">
                     <tr>
-                      <th class="px-6 py-4 text-left font-bold tracking-wider">ព័ត៌មាន</th>
-                      <th class="px-4 py-4 text-center font-bold tracking-wider">អ្នកនិពន្ធ</th>
-                      <th class="px-6 py-4 text-right font-bold tracking-wider">សកម្មភាព</th>
+                      <th class="px-6 py-4">អត្ថបទ</th>
+                      <th class="px-6 py-4 text-center">អ្នកនិពន្ធ</th>
+                      <th class="px-6 py-4 text-right">សកម្មភាព</th>
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-gray-50">
-                    <tr v-for="item in filteredTableData" :key="item.id" class="hover:bg-blue-50/20 transition-colors group">
-                      <td class="px-6 py-4">
+                    <tr v-for="item in filteredTableData" :key="item.id" class="hover:bg-blue-50/10 transition-colors group">
+                      <td class="px-6 py-5">
                         <div class="flex items-center gap-4">
-                          <div class="relative flex-shrink-0">
-                            <img :src="item.image" class="w-14 h-14 rounded-xl object-cover border border-gray-100 shadow-sm">
-                            <span class="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 border-2 border-white rounded-full"></span>
+                          <div class="w-16 h-12 rounded-xl overflow-hidden flex-shrink-0 border border-slate-100">
+                            <img :src="item.image" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                           </div>
                           <div class="min-w-0">
-                            <p class="text-sm font-bold text-slate-700 truncate group-hover:text-blue-600 transition-colors">{{ item.title }}</p>
-                            <div class="flex items-center gap-3 mt-1.5">
-                              <span class="px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-bold rounded-md capitalize">{{ getKhmerCategory(item.category) }}</span>
-                              <span class="text-[10px] text-slate-400 flex items-center gap-1"><i class="bi bi-calendar3"></i> {{ item.date }}</span>
+                            <p class="text-sm font-bold text-slate-700 truncate group-hover:text-blue-600 transition-colors mb-1">{{ item.title }}</p>
+                            <div class="flex items-center gap-2">
+                              <span class="text-[10px] font-bold px-2 py-0.5 bg-slate-100 rounded text-slate-500">{{ getKhmerCategory(item.category) }}</span>
+                              <span class="text-[10px] text-slate-300">•</span>
+                              <span class="text-[10px] text-slate-400">{{ item.date }}</span>
                             </div>
                           </div>
                         </div>
                       </td>
-                      <td class="px-4 py-4 text-center">
-                        <div class="flex flex-col items-center">
-                          <span class="text-xs font-bold text-slate-600">{{ item.author || 'Admin' }}</span>
-                          <span class="text-[9px] text-slate-400 uppercase tracking-tighter">Editor</span>
-                        </div>
+                      <td class="px-6 py-5 text-center">
+                        <span class="text-xs font-bold text-slate-600 bg-slate-50 px-3 py-1 rounded-full border border-slate-100">{{ item.author || 'Admin' }}</span>
                       </td>
-                      <td class="px-6 py-4 text-right">
-                        <div class="flex items-center justify-end gap-2">
-                          <button class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"><i class="bi bi-pencil-square"></i></button>
-                          <button @click="deleteNews(item.id)" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"><i class="bi bi-trash"></i></button>
+                      <td class="px-6 py-5 text-right">
+                        <div class="flex items-center justify-end gap-1">
+                          <button @click="startEdit(item)" class="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-all"><i class="bi bi-pencil-square"></i></button>
+                          <button @click="deleteNews(item.id)" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"><i class="bi bi-trash"></i></button>
                         </div>
                       </td>
                     </tr>
                     <tr v-if="filteredTableData.length === 0">
-                      <td colspan="3" class="px-6 py-12 text-center text-slate-400 text-sm">មិនទាន់មានអត្ថបទនៅឡើយទេ</td>
+                      <td colspan="3" class="px-6 py-20 text-center">
+                        <div class="flex flex-col items-center opacity-30">
+                          <i class="bi bi-inbox text-5xl mb-2"></i>
+                          <p class="text-sm">មិនមានទិន្នន័យស្វែងរកឡើយ</p>
+                        </div>
+                      </td>
                     </tr>
                   </tbody>
                 </table>
               </div>
             </div>
           </div>
-
         </div>
       </main>
     </div>
@@ -264,7 +242,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue';
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import Swal from 'sweetalert2';
 
@@ -272,8 +250,15 @@ const router = useRouter();
 const searchQuery = ref('');
 const activeTableTab = ref('All');
 const mobileMenuOpen = ref(false);
+const userMenuOpen = ref(false);
+const currentTime = ref('');
 const storageKey = 'app_news_data';
 const publishedNews = ref(JSON.parse(localStorage.getItem(storageKey) || '[]'));
+
+// Form States
+const isEditing = ref(false);
+const editingId = ref(null);
+const form = reactive({ category: 'Popular', title: '', content: '', author: '', image: '' });
 
 const tableTabs = [
   { id: 'All', name: 'ទាំងអស់' },
@@ -292,44 +277,103 @@ const categoriesKhmer = [
   { en: 'Society', kh: 'សង្គម' }
 ];
 
-const form = reactive({ category: 'Popular', badge: 'HOT', title: '', content: '', author: '', image: '' });
+// --- Live Clock Logic ---
+const updateTime = () => {
+  const now = new Date();
+  currentTime.value = now.toLocaleTimeString('km-KH', { 
+    hour: '2-digit', 
+    minute: '2-digit' 
+  }) + ' | ' + now.toLocaleDateString('km-KH', {
+    day: 'numeric',
+    month: 'long'
+  });
+};
 
-// --- CHART LOGIC ---
-const chartLabels = computed(() => {
-  return Array.from({ length: 7 }, (_, i) => {
-    const d = new Date();
-    d.setDate(d.getDate() - (6 - i));
-    return d.toLocaleDateString('km-KH', { day: 'numeric', month: 'short' });
+let clockTimer;
+onMounted(() => {
+  updateTime();
+  clockTimer = setInterval(updateTime, 1000);
+  
+  // Close user menu when clicking outside
+  window.addEventListener('click', (e) => {
+    if (!e.target.closest('.profile-trigger')) {
+      userMenuOpen.value = false;
+    }
   });
 });
 
-const chartPath = computed(() => {
-  const counts = chartLabels.value.map(label => {
-    // Check if article date matches label (e.g., "17 មករា")
-    return publishedNews.value.filter(n => n.date.includes(label.split(' ')[0])).length;
-  });
-
-  const max = Math.max(...counts, 4); // Scale based on data, minimum height for 4 articles
-  const width = 1000;
-  const height = 140; // Max vertical span in SVG coordinates
-
-  const points = counts.map((count, i) => ({
-    x: i * (width / (counts.length - 1)),
-    y: 180 - (count / max * height)
-  }));
-
-  const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ');
-  const areaPath = `${linePath} L1000,200 L0,200 Z`;
-
-  return { linePath, areaPath, points };
+onUnmounted(() => {
+  clearInterval(clockTimer);
+  window.removeEventListener('click', null);
 });
-// --------------------
 
+// --- Core Actions ---
+const resetForm = () => {
+  isEditing.value = false;
+  editingId.value = null;
+  form.title = ''; form.content = ''; form.image = ''; form.author = '';
+  form.category = 'Popular';
+};
+
+const startEdit = (item) => {
+  isEditing.value = true;
+  editingId.value = item.id;
+  Object.assign(form, { ...item });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+const handleImageUpload = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (event) => form.image = event.target.result;
+    reader.readAsDataURL(file);
+  }
+};
+
+const publishNews = () => {
+  if (!form.title || !form.image || !form.content) {
+    return Swal.fire({ icon: 'warning', title: 'បំពេញឱ្យគ្រប់', text: 'សូមបញ្ចូល ចំណងជើង រូបភាព និងខ្លឹមសារ', confirmButtonColor: '#2563eb' });
+  }
+
+  if (isEditing.value) {
+    const idx = publishedNews.value.findIndex(n => n.id === editingId.value);
+    if (idx !== -1) {
+      publishedNews.value[idx] = { ...publishedNews.value[idx], ...form };
+      Swal.fire({ icon: 'success', title: 'បានធ្វើបច្ចុប្បន្នភាព', timer: 1000, showConfirmButton: false });
+    }
+  } else {
+    const newItem = {
+      ...form,
+      id: Date.now(),
+      date: new Date().toLocaleDateString('km-KH', { day: 'numeric', month: 'short', year: 'numeric' })
+    };
+    publishedNews.value.unshift(newItem);
+    Swal.fire({ icon: 'success', title: 'បានរក្សាទុក', timer: 1000, showConfirmButton: false });
+  }
+
+  localStorage.setItem(storageKey, JSON.stringify(publishedNews.value));
+  resetForm();
+};
+
+const deleteNews = (id) => {
+  Swal.fire({ 
+    title: 'លុបអត្ថបទ?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'បាទ លុបចេញ' 
+  }).then(res => {
+    if (res.isConfirmed) {
+      publishedNews.value = publishedNews.value.filter(n => n.id !== id);
+      localStorage.setItem(storageKey, JSON.stringify(publishedNews.value));
+      if (editingId.value === id) resetForm();
+    }
+  });
+};
+
+// --- Computed Helpers ---
 const getCategoryCount = (id) => id === 'All' ? publishedNews.value.length : publishedNews.value.filter(i => i.category === id).length;
 const getKhmerCategory = (en) => categoriesKhmer.find(c => c.en === en)?.kh || en;
 const getIconForCategory = (id) => {
-  const icons = { 'All': 'bi-grid-fill', 'Popular': 'bi-lightning-charge-fill', 'Entertainment': 'bi-controller', 'Sports': 'bi-trophy-fill', 'Tech': 'bi-cpu-fill', 'Society': 'bi-people-fill' };
-  return icons[id] || 'bi-bookmark-fill';
+  const icons = { 'All': 'bi-grid-fill', 'Popular': 'bi-lightning-charge', 'Entertainment': 'bi-controller', 'Sports': 'bi-trophy', 'Tech': 'bi-cpu', 'Society': 'bi-people' };
+  return icons[id] || 'bi-bookmark';
 };
 
 const filteredTableData = computed(() => {
@@ -342,69 +386,40 @@ const filteredTableData = computed(() => {
   return list;
 });
 
-const handleImageUpload = (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    form.image = e.target.result;
-    Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'បានបញ្ចូលរូបភាព', showConfirmButton: false, timer: 1500 });
-  };
-  reader.readAsDataURL(file);
-};
-
-const publishNews = () => {
-  if (!form.title || !form.image || !form.content) {
-    return Swal.fire({ icon: 'warning', title: 'ព័ត៌មានមិនគ្រប់គ្រាន់', text: 'សូមបំពេញចំណងជើង ខ្លឹមសារ និងរូបភាព!', confirmButtonColor: '#2563eb' });
-  }
-  const newArticle = { 
-    id: Date.now(), 
-    category: form.category, 
-    badge: form.badge || 'INFO', 
-    title: form.title, 
-    content: form.content, 
-    author: form.author || 'Admin', 
-    date: new Date().toLocaleDateString('km-KH', { day: 'numeric', month: 'short', year: 'numeric' }), 
-    image: form.image 
-  };
-  publishedNews.value.unshift(newArticle);
-  localStorage.setItem(storageKey, JSON.stringify(publishedNews.value));
-  Swal.fire({ icon: 'success', title: 'ជោគជ័យ', text: 'អត្ថបទរបស់អ្នកត្រូវបានរក្សាទុក', timer: 2000, showConfirmButton: false });
-  form.title = ''; form.content = ''; form.image = ''; form.author = '';
-};
-
-const deleteNews = (id) => {
-  Swal.fire({ title: 'តើអ្នកប្រាកដទេ?', text: "អ្នកនឹងមិនអាចត្រឡប់វិញបានទេ!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#64748b', confirmButtonText: 'បាទ លុបវា!', cancelButtonText: 'បោះបង់'
-  }).then((result) => {
-    if (result.isConfirmed) {
-      publishedNews.value = publishedNews.value.filter(i => i.id !== id);
-      localStorage.setItem(storageKey, JSON.stringify(publishedNews.value));
-      Swal.fire('បានលុប!', 'អត្ថបទត្រូវបានលុបចេញពីប្រព័ន្ធ។', 'success');
-    }
-  });
-};
-
-const handleLogout = () => {
-  Swal.fire({ title: 'ចាកចេញ?', text: "តើអ្នកចង់ចាកចេញពីប្រព័ន្ធមែនទេ?", icon: 'question', showCancelButton: true, confirmButtonColor: '#2563eb', confirmButtonText: 'ចាកចេញ', cancelButtonText: 'បោះបង់'
-  }).then((result) => {
-    if (result.isConfirmed) {
-      localStorage.removeItem('admin_status');
-      router.push('/');
-    }
-  });
-};
+const handleLogout = () => router.push('/');
 </script>
 
 <style scoped>
+/* Global Font Imports - Include Battambang from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Battambang:wght@400;700;900&display=swap');
 @import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css');
-@import url('https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700&display=swap');
 
-.font-khmer { font-family:'Khmer OS Battambang', sans-serif; }
-::-webkit-scrollbar { width: 5px; }
+/* Main Font Family */
+.font-khmer { 
+    font-family: 'Battambang', 'Khmer OS Battambang', sans-serif; 
+}
+
+/* SweetAlert2 Specific Overrides to ensure Font Consistency */
+div:where(.swal2-container) div:where(.swal2-popup) {
+    font-family: 'Battambang', 'Khmer OS Battambang', sans-serif !important;
+}
+div:where(.swal2-container) .swal2-title {
+    font-size: 1.25rem !important;
+    font-weight: 700 !important;
+    color: #1e293b !important;
+}
+div:where(.swal2-container) .swal2-html-container {
+    font-size: 0.95rem !important;
+    color: #64748b !important;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-main > div { animation: fadeIn 0.4s ease-out forwards; }
+/* Transitions */
+.dropdown-enter-active, .dropdown-leave-active { transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+.dropdown-enter-from, .dropdown-leave-to { opacity: 0; transform: translateY(-8px) scale(0.95); }
 </style>
