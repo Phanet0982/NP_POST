@@ -49,7 +49,6 @@
     </aside>
 
     <div class="flex-1 flex flex-col min-w-0">
-      
       <header class="bg-white border-b border-gray-100 h-20 sticky top-0 z-30 hidden lg:flex items-center justify-between px-8">
         <div class="flex items-center gap-4">
           <div>
@@ -68,45 +67,19 @@
             <span class="text-[10px] text-slate-400">កាលបរិច្ឆេទថ្ងៃនេះ</span>
           </div>
 
-          <button class="relative p-2.5 text-slate-400 hover:bg-slate-50 rounded-xl transition-colors">
-            <i class="bi bi-bell text-xl"></i>
-            <span class="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 border-2 border-white rounded-full"></span>
-          </button>
-
           <div class="flex items-center gap-4 pl-6 border-l border-gray-100 relative profile-trigger">
             <div class="text-right hidden sm:block">
               <p class="text-[13px] font-black text-slate-800 leading-tight mb-0.5">Admin User</p>
-              <div class="flex items-center justify-end gap-1.5">
-                <span class="flex h-2 w-2 relative">
-                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
-                </span>
-                <p class="text-[10px] text-green-600 font-black uppercase tracking-widest">អនឡាញ</p>
-              </div>
+              <p class="text-[10px] text-green-600 font-black uppercase tracking-widest">អនឡាញ</p>
             </div>
-
-            <button @click="userMenuOpen = !userMenuOpen" 
-              class="group relative w-12 h-12 rounded-2xl bg-white p-1 shadow-sm border border-slate-100 transition-all hover:shadow-md hover:border-blue-200">
-              <div class="w-full h-full rounded-[12px] bg-gradient-to-tr from-slate-100 to-slate-200 flex items-center justify-center text-slate-400 overflow-hidden">
-                <i class="bi bi-person-fill text-2xl transition-transform group-hover:scale-110"></i>
-              </div>
+            <button @click="userMenuOpen = !userMenuOpen" class="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400">
+              <i class="bi bi-person-fill text-2xl"></i>
             </button>
-
-            <transition name="fade-slide">
-              <div v-if="userMenuOpen" class="absolute top-full right-0 mt-3 w-60 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50">
-                <div class="px-4 py-3 border-b border-gray-50 mb-1">
-                  <p class="text-[10px] font-bold text-slate-400 mb-1">គណនីគ្រប់គ្រង</p>
-                  <p class="text-xs font-bold text-slate-700 truncate">admin@gmail.com</p>
-                </div>
-                <button class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition-colors text-left font-medium">
-                  <i class="bi bi-person-circle text-base"></i> ព័ត៌មានផ្ទាល់ខ្លួន
-                </button>
-                <button class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition-colors text-left font-medium">
-                  <i class="bi bi-gear text-base"></i> ការកំណត់
-                </button>
-                <div class="h-px bg-gray-50 my-1"></div>
-                <button @click="handleLogout" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors text-left font-bold">
-                  <i class="bi bi-box-arrow-right text-base"></i> ចាកចេញពីប្រព័ន្ធ
+            
+            <transition name="dropdown">
+              <div v-if="userMenuOpen" class="absolute top-full right-0 mt-3 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50">
+                <button @click="handleLogout" class="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-500 hover:bg-red-50 font-bold">
+                  <i class="bi bi-box-arrow-right"></i> ចាកចេញ
                 </button>
               </div>
             </transition>
@@ -133,38 +106,44 @@
           <div class="xl:col-span-4">
             <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm sticky top-28">
               <div class="flex items-center gap-3 mb-6">
-                <div :class="isEditing ? 'bg-amber-50 text-amber-600' : 'bg-blue-50 text-blue-600'" class="w-12 h-12 rounded-2xl flex items-center justify-center transition-colors">
+                <div :class="isEditing ? 'bg-amber-50 text-amber-600' : 'bg-blue-50 text-blue-600'" class="w-12 h-12 rounded-2xl flex items-center justify-center">
                   <i :class="isEditing ? 'bi bi-pencil-square' : 'bi bi-plus-lg'" class="text-xl"></i>
                 </div>
                 <div>
-                  <h3 class="font-bold text-slate-800 text-lg">{{ isEditing ? 'កែប្រែអត្ថបទ' : 'អត្ថបទថ្មី' }}</h3>
-                  <p class="text-xs text-slate-400">{{ isEditing ? 'កំពុងកែប្រែទិន្នន័យចាស់' : 'បញ្ចូលព័ត៌មានទៅក្នុងប្រព័ន្ធ' }}</p>
+                  <h3 class="font-bold text-slate-800">{{ isEditing ? 'កែប្រែអត្ថបទ' : 'អត្ថបទថ្មី' }}</h3>
+                  <p class="text-[10px] text-slate-400">បំពេញព័ត៌មានខាងក្រោម</p>
                 </div>
               </div>
               
               <div class="space-y-4">
-                <div @click="$refs.fileInput.click()" class="relative aspect-video rounded-2xl border-2 border-dashed border-slate-200 overflow-hidden bg-slate-50 cursor-pointer hover:border-blue-400 transition-all group">
-                  <img v-if="form.image" :src="form.image" class="w-full h-full object-cover">
-                  <div v-else class="absolute inset-0 flex flex-col items-center justify-center text-slate-400">
-                    <i class="bi bi-image text-3xl mb-2"></i>
-                    <span class="text-xs font-bold">ជ្រើសរើសរូបភាពក្រប</span>
+                <div @click="$refs.fileInput.click()" class="relative aspect-video rounded-2xl border-2 border-dashed border-slate-200 overflow-hidden bg-slate-50 cursor-pointer hover:border-blue-400 transition-all group flex items-center justify-center">
+                  <template v-if="form.media">
+                    <img v-if="form.mediaType === 'image'" :src="form.media" class="w-full h-full object-cover">
+                    <video v-else :src="form.media" class="w-full h-full object-cover" autoplay muted loop></video>
+                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                      <i class="bi bi-camera text-white text-2xl"></i>
+                    </div>
+                  </template>
+                  <div v-else class="flex flex-col items-center text-slate-400">
+                    <i class="bi bi-cloud-arrow-up text-3xl mb-1"></i>
+                    <span class="text-[10px] font-bold">រូបភាព ឬ វីដេអូ</span>
                   </div>
-                  <input type="file" ref="fileInput" class="hidden" @change="handleImageUpload" accept="image/*">
+                  <input type="file" ref="fileInput" class="hidden" @change="handleMediaUpload" accept="image/*,video/*">
                 </div>
 
-                <input v-model="form.title" type="text" placeholder="ចំណងជើង..." class="w-full px-4 py-3 bg-slate-50 border border-transparent rounded-xl focus:bg-white focus:border-blue-500 outline-none transition-all font-bold">
-                <textarea v-model="form.content" rows="4" placeholder="ខ្លឹមសារអត្ថបទ..." class="w-full px-4 py-3 bg-slate-50 border border-transparent rounded-xl focus:bg-white focus:border-blue-500 outline-none transition-all resize-none text-sm"></textarea>
+                <input v-model="form.title" type="text" placeholder="ចំណងជើង..." class="w-full px-4 py-3 bg-slate-50 border-none rounded-xl focus:ring-2 focus:ring-blue-100 outline-none transition-all font-bold text-sm">
+                <textarea v-model="form.content" rows="4" placeholder="ខ្លឹមសារអត្ថបទ..." class="w-full px-4 py-3 bg-slate-50 border-none rounded-xl focus:ring-2 focus:ring-blue-100 outline-none transition-all resize-none text-sm"></textarea>
 
                 <div class="grid grid-cols-2 gap-3">
-                  <select v-model="form.category" class="px-3 py-3 bg-slate-50 rounded-xl text-sm outline-none border border-transparent focus:border-blue-500">
+                  <select v-model="form.category" class="px-3 py-3 bg-slate-50 rounded-xl text-[12px] outline-none">
                     <option v-for="cat in categoriesKhmer" :key="cat.en" :value="cat.en">{{ cat.kh }}</option>
                   </select>
-                  <input v-model="form.author" type="text" placeholder="អ្នកនិពន្ធ..." class="px-3 py-3 bg-slate-50 rounded-xl text-sm outline-none border border-transparent focus:border-blue-500 font-bold">
+                  <input v-model="form.author" type="text" placeholder="អ្នកនិពន្ធ..." class="px-3 py-3 bg-slate-50 rounded-xl text-sm outline-none font-bold">
                 </div>
 
-                <div class="flex gap-2 pt-2">
-                  <button v-if="isEditing" @click="resetForm" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold text-sm transition-all">បោះបង់</button>
-                  <button @click="publishNews" :class="isEditing ? 'bg-amber-500 hover:bg-amber-600' : 'bg-blue-600 hover:bg-blue-700'" class="flex-[2] py-3 text-white rounded-xl font-bold text-sm transition-all shadow-lg flex items-center justify-center gap-2">
+                <div class="flex gap-2">
+                  <button v-if="isEditing" @click="resetForm" class="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold text-sm">បោះបង់</button>
+                  <button @click="publishNews" :class="isEditing ? 'bg-amber-500' : 'bg-blue-600'" class="flex-[2] py-3 text-white rounded-xl font-bold text-sm shadow-lg">
                     {{ isEditing ? 'ធ្វើបច្ចុប្បន្នភាព' : 'រក្សាទុក' }}
                   </button>
                 </div>
@@ -174,60 +153,51 @@
 
           <div class="xl:col-span-8">
             <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-              <div class="p-6 border-b border-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                  <h3 class="font-bold text-slate-800 text-lg">បញ្ជីអត្ថបទ</h3>
-                  <p class="text-xs text-slate-400">គ្រប់គ្រង និងកែប្រែព័ត៌មានរបស់អ្នក</p>
-                </div>
+              <div class="p-6 border-b border-gray-50 flex items-center justify-between">
+                <h3 class="font-bold text-slate-800">បញ្ជីអត្ថបទ</h3>
                 <div class="relative">
-                  <i class="bi bi-search absolute left-4 top-8 -translate-y-1/2 text-slate-400"></i>
-                  <input v-model="searchQuery" type="text" placeholder="ស្វែងរកតាមចំណងជើង..." 
-                    class="w-full md:w-80 pl-11 pr-4 py-2.5 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-blue-100 transition-all outline-none">
+                  <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                  <input v-model="searchQuery" type="text" placeholder="ស្វែងរក..." class="pl-10 pr-4 py-2 bg-slate-50 rounded-xl text-sm outline-none w-64 focus:ring-2 focus:ring-blue-100 transition-all">
                 </div>
               </div>
 
               <div class="overflow-x-auto">
                 <table class="w-full text-left">
-                  <thead class="bg-slate-50/50 text-[10px] uppercase font-bold text-slate-400 border-b border-gray-50">
+                  <thead class="bg-slate-50/50 text-[10px] uppercase font-bold text-slate-400">
                     <tr>
                       <th class="px-6 py-4">អត្ថបទ</th>
-                      <th class="px-6 py-4 text-center">អ្នកនិពន្ធ</th>
+                      <th class="px-6 py-4 text-center">ប្រភេទ</th>
                       <th class="px-6 py-4 text-right">សកម្មភាព</th>
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-gray-50">
-                    <tr v-for="item in filteredTableData" :key="item.id" class="hover:bg-blue-50/10 transition-colors group">
-                      <td class="px-6 py-5">
+                    <tr v-for="item in filteredTableData" :key="item.id" class="hover:bg-slate-50/50 transition-colors group">
+                      <td class="px-6 py-4">
                         <div class="flex items-center gap-4">
-                          <div class="w-16 h-12 rounded-xl overflow-hidden flex-shrink-0 border border-slate-100">
-                            <img :src="item.image" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                          <div class="w-16 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-slate-100 border border-slate-100">
+                            <img v-if="item.mediaType === 'image'" :src="item.media" class="w-full h-full object-cover">
+                            <video v-else :src="item.media" class="w-full h-full object-cover" muted></video>
                           </div>
                           <div class="min-w-0">
-                            <p class="text-sm font-bold text-slate-700 truncate group-hover:text-blue-600 transition-colors mb-1">{{ item.title }}</p>
-                            <div class="flex items-center gap-2">
-                              <span class="text-[10px] font-bold px-2 py-0.5 bg-slate-100 rounded text-slate-500">{{ getKhmerCategory(item.category) }}</span>
-                              <span class="text-[10px] text-slate-300">•</span>
-                              <span class="text-[10px] text-slate-400">{{ item.date }}</span>
-                            </div>
+                            <p class="text-sm font-bold text-slate-700 truncate group-hover:text-blue-600 transition-colors">{{ item.title }}</p>
+                            <p class="text-[10px] text-slate-400">{{ item.date }} | {{ item.author || 'Admin' }}</p>
                           </div>
                         </div>
                       </td>
-                      <td class="px-6 py-5 text-center">
-                        <span class="text-xs font-bold text-slate-600 bg-slate-50 px-3 py-1 rounded-full border border-slate-100">{{ item.author || 'Admin' }}</span>
+                      <td class="px-6 py-4 text-center">
+                        <span class="text-[10px] font-bold px-2 py-0.5 bg-blue-50 text-blue-600 rounded-lg">{{ getKhmerCategory(item.category) }}</span>
                       </td>
-                      <td class="px-6 py-5 text-right">
+                      <td class="px-6 py-4 text-right">
                         <div class="flex items-center justify-end gap-1">
-                          <button @click="startEdit(item)" class="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-all"><i class="bi bi-pencil-square"></i></button>
-                          <button @click="deleteNews(item.id)" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"><i class="bi bi-trash"></i></button>
+                          <button @click="startEdit(item)" class="p-2 text-amber-500 hover:bg-amber-50 rounded-lg transition-all"><i class="bi bi-pencil-square"></i></button>
+                          <button @click="deleteNews(item.id)" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all"><i class="bi bi-trash"></i></button>
                         </div>
                       </td>
                     </tr>
                     <tr v-if="filteredTableData.length === 0">
-                      <td colspan="3" class="px-6 py-20 text-center">
-                        <div class="flex flex-col items-center opacity-30">
-                          <i class="bi bi-inbox text-5xl mb-2"></i>
-                          <p class="text-sm">មិនមានទិន្នន័យស្វែងរកឡើយ</p>
-                        </div>
+                      <td colspan="3" class="px-6 py-20 text-center text-slate-300">
+                        <i class="bi bi-inbox text-5xl"></i>
+                        <p class="text-sm mt-2">មិនមានទិន្នន័យឡើយ</p>
                       </td>
                     </tr>
                   </tbody>
@@ -245,6 +215,10 @@
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import Swal from 'sweetalert2';
+import localforage from 'localforage';
+
+// Database Config
+localforage.config({ name: 'NP_News_App', storeName: 'articles' });
 
 const router = useRouter();
 const searchQuery = ref('');
@@ -252,13 +226,11 @@ const activeTableTab = ref('All');
 const mobileMenuOpen = ref(false);
 const userMenuOpen = ref(false);
 const currentTime = ref('');
-const storageKey = 'app_news_data';
-const publishedNews = ref(JSON.parse(localStorage.getItem(storageKey) || '[]'));
+const publishedNews = ref([]);
 
-// Form States
 const isEditing = ref(false);
 const editingId = ref(null);
-const form = reactive({ category: 'Popular', title: '', content: '', author: '', image: '' });
+const form = reactive({ category: 'Popular', title: '', content: '', author: '', media: '', mediaType: 'image' });
 
 const tableTabs = [
   { id: 'All', name: 'ទាំងអស់' },
@@ -277,98 +249,81 @@ const categoriesKhmer = [
   { en: 'Society', kh: 'សង្គម' }
 ];
 
-// --- Live Clock Logic ---
+// --- Initialization ---
+onMounted(async () => {
+  const savedData = await localforage.getItem('news_list');
+  if (savedData) publishedNews.value = savedData;
+
+  updateTime();
+  setInterval(updateTime, 1000);
+
+  window.addEventListener('click', (e) => {
+    if (!e.target.closest('.profile-trigger')) userMenuOpen.value = false;
+  });
+});
+
 const updateTime = () => {
   const now = new Date();
-  currentTime.value = now.toLocaleTimeString('km-KH', { 
-    hour: '2-digit', 
-    minute: '2-digit' 
-  }) + ' | ' + now.toLocaleDateString('km-KH', {
-    day: 'numeric',
-    month: 'long'
-  });
+  currentTime.value = now.toLocaleTimeString('km-KH', { hour: '2-digit', minute: '2-digit' }) + ' | ' + now.toLocaleDateString('km-KH', { day: 'numeric', month: 'long' });
 };
 
-let clockTimer;
-onMounted(() => {
-  updateTime();
-  clockTimer = setInterval(updateTime, 1000);
-  
-  // Close user menu when clicking outside
-  window.addEventListener('click', (e) => {
-    if (!e.target.closest('.profile-trigger')) {
-      userMenuOpen.value = false;
-    }
-  });
-});
+// --- Actions ---
+const handleMediaUpload = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    if (file.size > 100 * 1024 * 1024) return Swal.fire('Error', 'File ធំពេក (លើសពី 100MB)', 'error');
+    
+    form.mediaType = file.type.startsWith('video') ? 'video' : 'image';
+    const reader = new FileReader();
+    reader.onload = (event) => form.media = event.target.result;
+    reader.readAsDataURL(file);
+  }
+};
 
-onUnmounted(() => {
-  clearInterval(clockTimer);
-  window.removeEventListener('click', null);
-});
+const publishNews = async () => {
+  if (!form.title || !form.media) return Swal.fire('Error', 'សូមបំពេញចំណងជើង និងរូបភាព/វីដេអូ', 'warning');
 
-// --- Core Actions ---
-const resetForm = () => {
-  isEditing.value = false;
-  editingId.value = null;
-  form.title = ''; form.content = ''; form.image = ''; form.author = '';
-  form.category = 'Popular';
+  if (isEditing.value) {
+    const idx = publishedNews.value.findIndex(n => n.id === editingId.value);
+    publishedNews.value[idx] = { ...publishedNews.value[idx], ...form };
+  } else {
+    publishedNews.value.unshift({
+      ...form,
+      id: Date.now(),
+      date: new Date().toLocaleDateString('km-KH', { day: 'numeric', month: 'short' })
+    });
+  }
+
+  await localforage.setItem('news_list', JSON.parse(JSON.stringify(publishedNews.value)));
+  Swal.fire({ icon: 'success', title: 'ជោគជ័យ', timer: 1000, showConfirmButton: false });
+  resetForm();
+};
+
+const deleteNews = async (id) => {
+  const res = await Swal.fire({ title: 'លុបអត្ថបទ?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444' });
+  if (res.isConfirmed) {
+    publishedNews.value = publishedNews.value.filter(n => n.id !== id);
+    await localforage.setItem('news_list', JSON.parse(JSON.stringify(publishedNews.value)));
+    if (editingId.value === id) resetForm();
+  }
 };
 
 const startEdit = (item) => {
   isEditing.value = true;
   editingId.value = item.id;
-  Object.assign(form, { ...item });
+  Object.assign(form, item);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-const handleImageUpload = (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = (event) => form.image = event.target.result;
-    reader.readAsDataURL(file);
-  }
+const resetForm = () => {
+  isEditing.value = false;
+  editingId.value = null;
+  Object.assign(form, { title: '', content: '', author: '', media: '', mediaType: 'image', category: 'Popular' });
 };
 
-const publishNews = () => {
-  if (!form.title || !form.image || !form.content) {
-    return Swal.fire({ icon: 'warning', title: 'បំពេញឱ្យគ្រប់', text: 'សូមបញ្ចូល ចំណងជើង រូបភាព និងខ្លឹមសារ', confirmButtonColor: '#2563eb' });
-  }
+const handleLogout = () => router.push('/');
 
-  if (isEditing.value) {
-    const idx = publishedNews.value.findIndex(n => n.id === editingId.value);
-    if (idx !== -1) {
-      publishedNews.value[idx] = { ...publishedNews.value[idx], ...form };
-      Swal.fire({ icon: 'success', title: 'បានធ្វើបច្ចុប្បន្នភាព', timer: 1000, showConfirmButton: false });
-    }
-  } else {
-    const newItem = {
-      ...form,
-      id: Date.now(),
-      date: new Date().toLocaleDateString('km-KH', { day: 'numeric', month: 'short', year: 'numeric' })
-    };
-    publishedNews.value.unshift(newItem);
-    Swal.fire({ icon: 'success', title: 'បានរក្សាទុក', timer: 1000, showConfirmButton: false });
-  }
-
-  localStorage.setItem(storageKey, JSON.stringify(publishedNews.value));
-  resetForm();
-};
-
-const deleteNews = (id) => {
-  Swal.fire({ 
-    title: 'លុបអត្ថបទ?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'បាទ លុបចេញ' 
-  }).then(res => {
-    if (res.isConfirmed) {
-      publishedNews.value = publishedNews.value.filter(n => n.id !== id);
-      localStorage.setItem(storageKey, JSON.stringify(publishedNews.value));
-      if (editingId.value === id) resetForm();
-    }
-  });
-};
-
-// --- Computed Helpers ---
+// --- Helpers ---
 const getCategoryCount = (id) => id === 'All' ? publishedNews.value.length : publishedNews.value.filter(i => i.category === id).length;
 const getKhmerCategory = (en) => categoriesKhmer.find(c => c.en === en)?.kh || en;
 const getIconForCategory = (id) => {
@@ -379,47 +334,25 @@ const getIconForCategory = (id) => {
 const filteredTableData = computed(() => {
   let list = publishedNews.value;
   if (activeTableTab.value !== 'All') list = list.filter(item => item.category === activeTableTab.value);
-  if (searchQuery.value) {
-    const q = searchQuery.value.toLowerCase();
-    list = list.filter(item => item.title.toLowerCase().includes(q) || item.author?.toLowerCase().includes(q));
-  }
+  if (searchQuery.value) list = list.filter(item => item.title.toLowerCase().includes(searchQuery.value.toLowerCase()));
   return list;
 });
-
-const handleLogout = () => router.push('/');
 </script>
 
 <style scoped>
-/* Global Font Imports - Include Battambang from Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Battambang:wght@400;700;900&display=swap');
 @import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css');
 
-/* Main Font Family */
-.font-khmer { 
-    font-family: 'Battambang', 'Khmer OS Battambang', sans-serif; 
-}
+.font-khmer { font-family: 'Battambang', sans-serif; }
 
-/* SweetAlert2 Specific Overrides to ensure Font Consistency */
-div:where(.swal2-container) div:where(.swal2-popup) {
-    font-family: 'Battambang', 'Khmer OS Battambang', sans-serif !important;
-}
-div:where(.swal2-container) .swal2-title {
-    font-size: 1.25rem !important;
-    font-weight: 700 !important;
-    color: #1e293b !important;
-}
-div:where(.swal2-container) .swal2-html-container {
-    font-size: 0.95rem !important;
-    color: #64748b !important;
-}
+/* Custom Transitions */
+.dropdown-enter-active, .dropdown-leave-active { transition: all 0.2s ease-out; }
+.dropdown-enter-from, .dropdown-leave-to { opacity: 0; transform: translateY(-10px); }
 
 /* Custom Scrollbar */
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-/* Transitions */
-.dropdown-enter-active, .dropdown-leave-active { transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
-.dropdown-enter-from, .dropdown-leave-to { opacity: 0; transform: translateY(-8px) scale(0.95); }
+/* SweetAlert consistency */
+div:where(.swal2-container) div:where(.swal2-popup) { font-family: 'Battambang', sans-serif !important; }
 </style>

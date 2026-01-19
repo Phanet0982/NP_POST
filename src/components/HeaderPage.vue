@@ -180,7 +180,7 @@ const showModal = ref(false);
 const authMode = ref('login');
 const authForm = reactive({ name: '', email: '', password: '' });
 
-const MASTER_EMAIL = 'admin@gmail.com';
+const MASTER_EMAIL = 'phanet@gmail.com';
 const MASTER_PASS = 'admin12345';
 
 // --- SEARCH STATE ---
