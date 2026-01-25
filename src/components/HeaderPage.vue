@@ -24,41 +24,50 @@
           <i class="bi bi-list fs-4"></i>
         </button>
         
-<div class="search-wrapper d-none d-lg-block">
-  <div class="input-group input-group-sm search-box">
-    <span class="input-group-text bg-light border-0"><i class="bi bi-search text-primary"></i></span>
-    <input 
-      v-model="searchQuery" 
-      @input="handleSearch"
-      @focus="isFocused = true"
-      type="text" 
-      class="form-control bg-light border-0 shadow-none" 
-      placeholder="ស្វែងរកអត្ថបទព័ត៌មាន..."
-    >
-  </div>
-  
-  <div v-if="searchQuery && isFocused" class="search-results-dropdown shadow-lg">
-    <div class="dropdown-header-custom">
-      <span>លទ្ធផលស្វែងរក</span>
-      <span class="badge bg-primary-subtle text-primary">{{ searchResults.length }}</span>
-    </div>
+        <div class="search-wrapper d-none d-lg-block">
+          <div class="input-group input-group-sm search-box">
+            <span class="input-group-text bg-light border-0"><i class="bi bi-search text-primary"></i></span>
+            <input 
+              v-model="searchQuery" 
+              @input="handleSearch"
+              @focus="isFocused = true"
+              type="text" 
+              class="form-control bg-light border-0 shadow-none" 
+              placeholder="ស្វែងរកអត្ថបទព័ត៌មាន..."
+            >
+          </div>
+          
+          <div v-if="searchQuery && isFocused" class="search-results-dropdown shadow-lg">
+            <div class="dropdown-header-custom">
+              <span>លទ្ធផលស្វែងរក</span>
+              <span class="badge bg-primary-subtle text-primary">{{ searchResults.length }}</span>
+            </div>
 
-    <div v-if="searchResults.length > 0">
-      <div v-for="item in searchResults" :key="item.id" @click="goToArticle(item)" class="search-result-item">
-        <img :src="item.image" class="result-img">
-        <div class="result-info">
-          <div class="result-title text-truncate">{{ item.title }}</div>
-          <small class="text-primary fw-bold">{{ item.category }} • {{ item.date }}</small>
+            <div v-if="searchResults.length > 0">
+              <div v-for="item in searchResults" :key="item.id" @click="goToArticle(item)" class="search-result-item">
+                
+                <div v-if="item.media && item.media.startsWith('data:video')" 
+                     class="media-thumbnail bg-dark d-flex align-items-center justify-content-center text-white">
+                  <i class="bi bi-play-circle-fill fs-5"></i>
+                </div>
+                
+                <img v-else 
+                     :src="item.media || 'https://placehold.co/100x100?text=No+Img'" 
+                     class="result-img" 
+                     alt="News">
+                <div class="result-info">
+                  <div class="result-title text-truncate">{{ item.title }}</div>
+                  <small class="text-primary fw-bold">{{ item.category }} • {{ item.date }}</small>
+                </div>
+                <i class="bi bi-chevron-right ms-auto text-muted small"></i>
+              </div>
+            </div>
+
+            <div v-else class="p-4 text-center">
+              <p class="text-muted small mb-0">មិនឃើញមានទិន្នន័យសម្រាប់ "{{ searchQuery }}"</p>
+            </div>
+          </div>
         </div>
-        <i class="bi bi-chevron-right ms-auto text-muted small"></i>
-      </div>
-    </div>
-
-    <div v-else class="p-4 text-center">
-      <p class="text-muted small mb-0">មិនឃើញមានទិន្នន័យសម្រាប់ "{{ searchQuery }}"</p>
-    </div>
-  </div>
-</div>
       </div>
 
       <div class="text-center d-lg-none flex-grow-1">
@@ -91,35 +100,35 @@
                    class="rounded-circle border border-2 border-primary p-0.5 cursor-pointer profile-img shadow-sm" 
                    alt="Profile">
               <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2 p-2" :class="{ show: showDropdown }">
-  <li class="d-md-none">
-    <div class="dropdown-header text-dark fw-bold border-bottom pb-2 mb-2">
-      {{ user.name }}
-    </div>
-  </li>
-  
-  <li v-if="user.role === 'admin'">
-    <router-link to="/management" class="dropdown-item rounded-2 text-primary fw-bold">
-      <i class="bi bi-speedometer2"></i>
-      <span>គ្រប់គ្រងអត្ថបទ</span>
-    </router-link>
-  </li>
-  
-  <li>
-    <a class="dropdown-item rounded-2" href="#">
-      <i class="bi bi-person"></i>
-      <span>គណនីរបស់ខ្ញុំ</span>
-    </a>
-  </li>
-  
-  <li><hr class="dropdown-divider"></li>
-  
-  <li>
-    <button class="dropdown-item rounded-2 text-danger" @click="handleLogout">
-      <i class="bi bi-box-arrow-right"></i>
-      <span>ចាកចេញ</span>
-    </button>
-  </li>
-</ul>
+                <li class="d-md-none">
+                  <div class="dropdown-header text-dark fw-bold border-bottom pb-2 mb-2">
+                    {{ user.name }}
+                  </div>
+                </li>
+                
+                <li v-if="user.role === 'admin'">
+                  <router-link to="/management" class="dropdown-item rounded-2 text-primary fw-bold">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>គ្រប់គ្រងអត្ថបទ</span>
+                  </router-link>
+                </li>
+                
+                <li>
+                  <a class="dropdown-item rounded-2" href="#">
+                    <i class="bi bi-person"></i>
+                    <span>គណនីរបស់ខ្ញុំ</span>
+                  </a>
+                </li>
+                
+                <li><hr class="dropdown-divider"></li>
+                
+                <li>
+                  <button class="dropdown-item rounded-2 text-danger" @click="handleLogout">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>ចាកចេញ</span>
+                  </button>
+                </li>
+              </ul>
             </div>
           </div>
         </template>
@@ -168,6 +177,12 @@
 <script setup>
 import { ref, reactive, onMounted, onUnmounted, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
+// IMPORTANT: Import localforage to read dashboard data
+import localforage from 'localforage'; 
+
+// --- DATABASE CONFIG ---
+// Config must match the one used in Management/Dashboard
+localforage.config({ name: 'NP_News_App', storeName: 'articles' });
 
 // --- CONFIG & ROUTING ---
 const router = useRouter();
@@ -193,7 +208,6 @@ onMounted(() => {
   const savedUser = localStorage.getItem('np_news_user');
   if (savedUser) user.value = JSON.parse(savedUser);
   
-  // Close dropdowns when clicking anywhere outside
   window.addEventListener('click', handleGlobalClick);
 });
 
@@ -201,35 +215,39 @@ onUnmounted(() => {
   window.removeEventListener('click', handleGlobalClick);
 });
 
-// --- SEARCH LOGIC ---
-const handleSearch = () => {
+// --- UPDATED SEARCH LOGIC ---
+const handleSearch = async () => {
   if (!searchQuery.value.trim()) {
     searchResults.value = [];
     return;
   }
 
-  // Use the correct key: app_news_data
-  const allNews = JSON.parse(localStorage.getItem('app_news_data') || '[]');
-  const query = searchQuery.value.toLowerCase();
-  
-  searchResults.value = allNews.filter(item => 
-    item.title.toLowerCase().includes(query) || 
-    item.category.toLowerCase().includes(query)
-  ).slice(0, 5);
+  try {
+    // 1. Fetch from localforage (same place Dashboard saves data)
+    const allNews = await localforage.getItem('news_list') || [];
+    const query = searchQuery.value.toLowerCase();
+    
+    // 2. Filter Results
+    searchResults.value = allNews.filter(item => 
+      item.title.toLowerCase().includes(query) || 
+      (item.category && item.category.toLowerCase().includes(query))
+    ).slice(0, 5); // Limit to 5 results
+  } catch (error) {
+    console.error("Error searching news:", error);
+    searchResults.value = [];
+  }
 };
 
 const goToArticle = async (item) => {
-  // Clear search state first to avoid UI flickering
+  // Clear search state first
   const targetId = item.id;
   searchQuery.value = '';
   isFocused.value = false;
   searchResults.value = [];
 
-  // Wait for DOM updates then navigate
   await nextTick();
-  router.push(`/news/${targetId}`).catch(err => {
-    console.error("Navigation failed:", err);
-  });
+  // Navigate to Detail page using ID
+  router.push(`/news/${targetId}`);
 };
 
 // --- AUTH LOGIC ---
@@ -239,6 +257,7 @@ const openAuthModal = (mode) => {
 };
 
 const handleAuthSubmit = () => {
+  // Admin Check
   if (authForm.email === MASTER_EMAIL && authForm.password === MASTER_PASS) {
     const adminUser = {
       name: 'NP Administrator',
@@ -251,6 +270,7 @@ const handleAuthSubmit = () => {
     return;
   }
 
+  // Normal User Check
   if (authMode.value === 'login') {
     const storedUser = localStorage.getItem(`user_${authForm.email}`);
     if (storedUser) {
@@ -268,6 +288,7 @@ const handleAuthSubmit = () => {
     }
     alert('អុីមែល ឬលេខសម្ងាត់មិនត្រឹមត្រូវ!');
   } else {
+    // Register Logic
     localStorage.setItem(`user_${authForm.email}`, JSON.stringify({ ...authForm }));
     alert('ចុះឈ្មោះជោគជ័យ! សូមចូលប្រើប្រាស់។');
     authMode.value = 'login';
@@ -293,14 +314,8 @@ const handleLogout = () => {
 const toggleDropdown = () => (showDropdown.value = !showDropdown.value);
 
 const handleGlobalClick = (e) => {
-  // 1. Close profile dropdown
-  if (!e.target.closest('.profile-img')) {
-    showDropdown.value = false;
-  }
-  // 2. Close search results (Ensure we don't close if clicking a result)
-  if (!e.target.closest('.search-wrapper')) {
-    isFocused.value = false;
-  }
+  if (!e.target.closest('.profile-img')) showDropdown.value = false;
+  if (!e.target.closest('.search-wrapper')) isFocused.value = false;
 };
 </script>
 
@@ -314,7 +329,7 @@ const handleGlobalClick = (e) => {
 .profile-img { width: 40px; height: 40px; object-fit: cover; }
 .cursor-pointer { cursor: pointer; }
 
-/* Modal Styles with Fixed Semicolon Error */
+/* Modal Styles */
 .modal-overlay {
   position: fixed; top: 0; left: 0; width: 100%; height: 100%;
   background: rgba(15, 23, 42, 0.6); z-index: 3000; backdrop-filter: blur(8px);
@@ -337,7 +352,6 @@ const handleGlobalClick = (e) => {
   0% { transform: translateX(100%); }
   100% { transform: translateX(-100%); }
 }
-
 .anim-pulse { animation: pulse 2s infinite; }
 @keyframes pulse {
   0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
@@ -345,15 +359,14 @@ const handleGlobalClick = (e) => {
   100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
 }
 
-/* Improve the dropdown appearance */
+/* Dropdown & Search Styles */
 .dropdown-menu {
-  min-width: 220px; /* Give it enough width so text doesn't wrap */
+  min-width: 220px;
   border-radius: 12px;
   border: 1px solid rgba(0,0,0,0.05) !important;
   padding: 8px !important;
-  right: 0; /* Ensures it aligns to the right edge of the avatar */
+  right: 0;
 }
-
 .dropdown-item {
   padding: 10px 15px;
   display: flex;
@@ -361,100 +374,50 @@ const handleGlobalClick = (e) => {
   font-size: 0.95rem;
   transition: all 0.2s;
 }
+.dropdown-item i { font-size: 1.2rem; width: 25px; margin-right: 12px; }
+.dropdown-item:hover { background-color: #f8f9fa; color: #0d6efd; }
 
-.dropdown-item i {
-  font-size: 1.2rem;
-  width: 25px; /* Fixed width for icons so text aligns vertically */
-  margin-right: 12px;
-}
-
-.dropdown-item:hover {
-  background-color: #f8f9fa;
-  color: #0d6efd;
-}
-
-.text-danger:hover {
-  background-color: #fff5f5;
-  color: #dc3545 !important;
-}
-
-.search-wrapper {
-  position: relative;
-  width: 320px;
-  z-index: 1050;
-}
-
+.search-wrapper { position: relative; width: 320px; z-index: 1050; }
 .search-box {
   border-radius: 10px;
   overflow: hidden;
   transition: all 0.3s ease;
   border: 1px solid transparent;
 }
-
-.search-box:focus-within {
-  border-color: #0d6efd;
-  background: white;
-}
+.search-box:focus-within { border-color: #0d6efd; background: white; }
 
 .search-results-dropdown {
-  position: absolute;
-  top: 110%;
-  left: 0;
-  right: 0;
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid #edf2f7;
+  position: absolute; top: 110%; left: 0; right: 0;
+  background: white; border-radius: 12px;
+  overflow: hidden; border: 1px solid #edf2f7;
   animation: slideIn 0.2s ease-out;
 }
-
 @keyframes slideIn {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 .dropdown-header-custom {
-  padding: 10px 15px;
-  background: #f8fafc;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #64748b;
-  display: flex;
-  justify-content: space-between;
+  padding: 10px 15px; background: #f8fafc;
+  font-size: 0.75rem; font-weight: 700; color: #64748b;
+  display: flex; justify-content: space-between;
   border-bottom: 1px solid #f1f5f9;
 }
 
 .search-result-item {
-  display: flex;
-  align-items: center;
-  padding: 12px 15px;
-  cursor: pointer;
-  transition: background 0.2s;
+  display: flex; align-items: center; padding: 12px 15px;
+  cursor: pointer; transition: background 0.2s;
   border-bottom: 1px solid #f8fafc;
 }
+.search-result-item:hover { background: #f0f7ff; }
 
-.search-result-item:hover {
-  background: #f0f7ff;
+/* Styles for Result Images & Media Thumbnails */
+.result-img, .media-thumbnail {
+  width: 44px; height: 44px;
+  object-fit: cover; border-radius: 8px;
+  margin-right: 12px; flex-shrink: 0;
 }
 
-.result-img {
-  width: 44px;
-  height: 44px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin-right: 12px;
-}
-
-.result-title {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #1e293b;
-  line-height: 1.4;
-}
-
-.text-truncate {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+.result-title { font-size: 0.85rem; font-weight: 600; color: #1e293b; line-height: 1.4; }
+.text-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 </style>

@@ -22,7 +22,7 @@
 
     <nav class="sidebar-nav py-4 d-flex flex-column h-100">
       <div class="menu-section px-3">
-        <small class="section-title text-muted mb-3 d-block px-3 text-uppercase fw-bold">
+        <small class="text-muted mb-3 d-block px-3 fw-bold">
           មឺនុយមេ (MAIN MENU)
         </small>
 
