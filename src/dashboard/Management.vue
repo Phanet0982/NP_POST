@@ -156,7 +156,7 @@
               <div class="p-6 border-b border-gray-50 flex items-center justify-between">
                 <h3 class="font-bold text-slate-800">បញ្ជីអត្ថបទ</h3>
                 <div class="relative">
-                  <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                  <i class="bi bi-search absolute left-4 top-8 -translate-y-1/2 text-slate-400"></i>
                   <input v-model="searchQuery" type="text" placeholder="ស្វែងរក..." class="pl-10 pr-4 py-2 bg-slate-50 rounded-xl text-sm outline-none w-64 focus:ring-2 focus:ring-blue-100 transition-all">
                 </div>
               </div>
@@ -343,7 +343,7 @@ const filteredTableData = computed(() => {
 @import url('https://fonts.googleapis.com/css2?family=Battambang:wght@400;700;900&display=swap');
 @import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css');
 
-.font-khmer { font-family: 'Battambang', sans-serif; }
+.font-khmer { font-family: 'Khmer OS Battambang', sans-serif; }
 
 /* Custom Transitions */
 .dropdown-enter-active, .dropdown-leave-active { transition: all 0.2s ease-out; }
