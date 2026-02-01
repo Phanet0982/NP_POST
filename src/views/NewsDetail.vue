@@ -115,14 +115,22 @@ const newCommentText = ref('');
 const allNewsData = ref([]);
 const isLoading = ref(true);
 
-// Database Config
 localforage.config({ name: 'NP_News_App', storeName: 'articles' });
 
-// --- Helper: Check Authentication ---
+// --- Helper: Enhanced Auth Check ---
 const getSessionUser = () => {
   const sessionData = localStorage.getItem('np_news_user');
   if (!sessionData) return null;
-  return JSON.parse(sessionData);
+  
+  const currentUser = JSON.parse(sessionData);
+  
+  // Explicitly block the guest account from being recognized as "logged in"
+  if (currentUser.email === 'guest@test.com') {
+    localStorage.removeItem('np_news_user'); // Clean it up
+    return null;
+  }
+  
+  return currentUser;
 };
 
 // --- Data Loading ---
@@ -135,7 +143,6 @@ const loadData = async () => {
       const found = allNewsData.value.find(item => item.id == route.params.id);
       article.value = found;
       
-      // Get 6 recent news (excluding current)
       recentNews.value = allNewsData.value
         .filter(item => item.id != route.params.id)
         .slice(0, 6);
@@ -155,13 +162,12 @@ const saveToDB = async () => {
 // --- Interactions ---
 
 const handleLike = () => {
-  // 1. Check Auth First
-  if (!getSessionUser()) {
-    alert("សូមមេត្តាចូលគណនី (Login) ដើម្បីចុច Like!");
+  const currentUser = getSessionUser();
+  if (!currentUser) {
+    alert("សូមចូលប្រើប្រាស់គណនីរបស់អ្នក ដើម្បីចូលចិត្តអត្ថបទនេះ!");
     return;
   }
 
-  // 2. Perform Like Logic
   if (!article.value.isLiked) {
     article.value.likes = (article.value.likes || 0) + 1;
     article.value.isLiked = true;
@@ -173,17 +179,14 @@ const handleLike = () => {
 };
 
 const submitComment = () => {
-  // 1. Check Auth First
   const currentUser = getSessionUser();
   if (!currentUser) {
-    alert("សូមមេត្តាចូលគណនី (Login) ដើម្បីបញ្ចេញមតិ!");
+    alert("សូមចូលប្រើប្រាស់គណនីរបស់អ្នក ដើម្បីបញ្ចេញមតិយោបល់!");
     return;
   }
 
-  // 2. Validation
   if (!newCommentText.value.trim()) return;
   
-  // 3. Create Comment Object
   const newComment = {
     text: newCommentText.value,
     userName: currentUser.name,
@@ -226,7 +229,12 @@ const getKhmerCategory = (en) => {
   return map[en] || en;
 };
 
-onMounted(loadData);
+onMounted(() => {
+  // Clear any existing "Guest" data on entry
+  getSessionUser(); 
+  loadData();
+});
+
 watch(() => route.params.id, loadData);
 </script>
 

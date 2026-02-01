@@ -66,24 +66,6 @@
             <span class="text-xs font-bold text-slate-700">{{ currentTime }}</span>
             <span class="text-[10px] text-slate-400">កាលបរិច្ឆេទថ្ងៃនេះ</span>
           </div>
-
-          <div class="flex items-center gap-4 pl-6 border-l border-gray-100 relative profile-trigger">
-            <div class="text-right hidden sm:block">
-              <p class="text-[13px] font-black text-slate-800 leading-tight mb-0.5">Admin User</p>
-              <p class="text-[10px] text-green-600 font-black uppercase tracking-widest">អនឡាញ</p>
-            </div>
-            <button @click="userMenuOpen = !userMenuOpen" class="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400">
-              <i class="bi bi-person-fill text-2xl"></i>
-            </button>
-            
-            <transition name="dropdown">
-              <div v-if="userMenuOpen" class="absolute top-full right-0 mt-3 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50">
-                <button @click="handleLogout" class="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-500 hover:bg-red-50 font-bold">
-                  <i class="bi bi-box-arrow-right"></i> ចាកចេញ
-                </button>
-              </div>
-            </transition>
-          </div>
         </div>
       </header>
 
@@ -212,7 +194,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, onUnmounted } from 'vue';
+import { ref, reactive, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import Swal from 'sweetalert2';
 import localforage from 'localforage';
@@ -224,7 +206,6 @@ const router = useRouter();
 const searchQuery = ref('');
 const activeTableTab = ref('All');
 const mobileMenuOpen = ref(false);
-const userMenuOpen = ref(false);
 const currentTime = ref('');
 const publishedNews = ref([]);
 
@@ -256,10 +237,6 @@ onMounted(async () => {
 
   updateTime();
   setInterval(updateTime, 1000);
-
-  window.addEventListener('click', (e) => {
-    if (!e.target.closest('.profile-trigger')) userMenuOpen.value = false;
-  });
 });
 
 const updateTime = () => {
@@ -271,7 +248,15 @@ const updateTime = () => {
 const handleMediaUpload = (e) => {
   const file = e.target.files[0];
   if (file) {
-    if (file.size > 100 * 1024 * 1024) return Swal.fire('Error', 'File ធំពេក (លើសពី 100MB)', 'error');
+    if (file.size > 100 * 1024 * 1024) {
+      // Updated Khmer Alert
+      return Swal.fire({
+        icon: 'error',
+        title: 'កំហុស',
+        text: 'ទំហំឯកសារធំពេក (លើសពី 100MB)',
+        confirmButtonText: 'យល់ព្រម'
+      });
+    }
     
     form.mediaType = file.type.startsWith('video') ? 'video' : 'image';
     const reader = new FileReader();
@@ -281,7 +266,16 @@ const handleMediaUpload = (e) => {
 };
 
 const publishNews = async () => {
-  if (!form.title || !form.media) return Swal.fire('Error', 'សូមបំពេញចំណងជើង និងរូបភាព/វីដេអូ', 'warning');
+  if (!form.title || !form.media) {
+    // Updated Khmer Alert
+    return Swal.fire({
+      icon: 'warning',
+      title: 'មិនទាន់ពេញលេញ',
+      text: 'សូមបំពេញចំណងជើង និងរូបភាព/វីដេអូ',
+      confirmButtonText: 'យល់ព្រម',
+      confirmButtonColor: '#f59e0b'
+    });
+  }
 
   if (isEditing.value) {
     const idx = publishedNews.value.findIndex(n => n.id === editingId.value);
@@ -295,16 +289,44 @@ const publishNews = async () => {
   }
 
   await localforage.setItem('news_list', JSON.parse(JSON.stringify(publishedNews.value)));
-  Swal.fire({ icon: 'success', title: 'ជោគជ័យ', timer: 1000, showConfirmButton: false });
+  
+  // Updated Success Alert
+  Swal.fire({ 
+    icon: 'success', 
+    title: 'ជោគជ័យ', 
+    text: 'ទិន្នន័យត្រូវបានរក្សាទុក',
+    timer: 1500, 
+    showConfirmButton: false 
+  });
   resetForm();
 };
 
 const deleteNews = async (id) => {
-  const res = await Swal.fire({ title: 'លុបអត្ថបទ?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444' });
+  // Updated Delete Confirmation with Khmer Text and Styling
+  const res = await Swal.fire({ 
+    title: 'តើអ្នកពិតជាចង់លុបមែនទេ?',
+    text: "ទិន្នន័យនឹងមិនអាចត្រឡប់មកវិញបានឡើយ!",
+    icon: 'warning', 
+    showCancelButton: true, 
+    confirmButtonColor: '#ef4444',
+    cancelButtonColor: '#64748b',
+    confirmButtonText: 'លុបចេញ',
+    cancelButtonText: 'បោះបង់',
+    reverseButtons: true
+  });
+
   if (res.isConfirmed) {
     publishedNews.value = publishedNews.value.filter(n => n.id !== id);
     await localforage.setItem('news_list', JSON.parse(JSON.stringify(publishedNews.value)));
     if (editingId.value === id) resetForm();
+    
+    Swal.fire({
+      icon: 'success',
+      title: 'បានលុប',
+      text: 'ទិន្នន័យត្រូវបានលុបជោគជ័យ',
+      showConfirmButton: false,
+      timer: 1000
+    });
   }
 };
 
@@ -343,7 +365,35 @@ const filteredTableData = computed(() => {
 @import url('https://fonts.googleapis.com/css2?family=Battambang:wght@400;700;900&display=swap');
 @import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css');
 
-.font-khmer { font-family: 'Khmer OS Battambang', sans-serif; }
+.font-khmer { font-family: 'Battambang', 'Khmer OS Battambang', sans-serif; }
+
+/* --- SweetAlert2 Global Font Overrides --- */
+/* Use :deep() to force styles into child components like SweetAlert */
+:deep(.swal2-popup),
+:deep(.swal2-title),
+:deep(.swal2-html-container),
+:deep(.swal2-confirm),
+:deep(.swal2-cancel) {
+  font-family: 'Battambang', 'Khmer OS Battambang', sans-serif !important;
+}
+
+:deep(.swal2-title) {
+  font-size: 1.25rem !important; /* 20px */
+}
+
+/* Styled SweetAlert Buttons to match Tailwind */
+:deep(.swal2-confirm) {
+  border-radius: 0.75rem !important;
+  padding: 0.6rem 2rem !important;
+  font-weight: 700 !important;
+  box-shadow: none !important;
+}
+
+:deep(.swal2-cancel) {
+  border-radius: 0.75rem !important;
+  padding: 0.6rem 2rem !important;
+  font-weight: 700 !important;
+}
 
 /* Custom Transitions */
 .dropdown-enter-active, .dropdown-leave-active { transition: all 0.2s ease-out; }
@@ -352,7 +402,4 @@ const filteredTableData = computed(() => {
 /* Custom Scrollbar */
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-
-/* SweetAlert consistency */
-div:where(.swal2-container) div:where(.swal2-popup) { font-family: 'Battambang', sans-serif !important; }
 </style>

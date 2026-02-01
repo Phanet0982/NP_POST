@@ -36,7 +36,6 @@
               placeholder="ស្វែងរកអត្ថបទព័ត៌មាន..."
             >
           </div>
-          
           <div v-if="searchQuery && isFocused" class="search-results-dropdown shadow-lg">
             <div class="dropdown-header-custom">
               <span>លទ្ធផលស្វែងរក</span>
@@ -65,10 +64,10 @@
       <div class="text-center d-lg-none flex-grow-1">
         <div class="d-flex align-items-center justify-content-center cursor-pointer" @click="router.push('/')">
           <img src="https://png.pngtree.com/png-vector/20220714/ourmid/pngtree-np-icon-vector-illustration-design-letter-monogram-alphabet-vector-png-image_37915324.png" 
-                alt="Logo" class="brand-logo me-2" />
+               alt="Logo" class="brand-logo me-2" />
           <div class="text-start d-sm-block" style="line-height: 1.1;">
             <h1 class="h5 fw-black mb-0 text-dark">NP <span class="text-primary">News</span></h1>
-            <small class="text-muted fw-light" style="font-size: 0.7rem;">DIGITAL MEDIA</small>
+            <small class="text-muted fw-light" style="font-size: 0.7rem;">News Information</small>
           </div>
         </div>
       </div>
@@ -88,13 +87,13 @@
             <div class="text-end d-none d-md-block">
               <div class="fw-bold small" style="line-height: 1">{{ user.name }}</div>
               <span v-if="user.role === 'admin'" class="badge bg-danger-subtle text-danger border border-danger-subtle mt-1" style="font-size: 0.6rem;">ADMIN PANEL</span>
-              <small v-else class="text-muted" style="font-size: 0.7rem;">{{ user.email }}</small>
+              <small v-else class="text-muted​​​​ text-primary" style="font-size: 0.7rem;">{{ user.email }}</small>
             </div>
             <div class="dropdown">
               <img :src="user.avatar" 
-                    @click.stop="toggleDropdown"
-                    class="rounded-circle border border-2 border-primary p-0.5 cursor-pointer profile-img shadow-sm" 
-                    alt="Profile">
+                   @click.stop="toggleDropdown"
+                   class="rounded-circle border border-2 border-primary p-0.5 cursor-pointer profile-img shadow-sm" 
+                   alt="Profile">
               <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2 p-2" :class="{ show: showDropdown }">
                 <li v-if="user.role === 'admin'">
                   <router-link to="/management" class="dropdown-item rounded-2 text-primary fw-bold">
@@ -103,7 +102,7 @@
                   </router-link>
                 </li>
                 <li>
-                  <a class="dropdown-item rounded-2" href="#">
+                  <a class="dropdown-item rounded-2 cursor-pointer" @click="openProfileModal">
                     <i class="bi bi-person"></i>
                     <span>គណនីរបស់ខ្ញុំ</span>
                   </a>
@@ -183,6 +182,65 @@
         </div>
       </div>
     </div>
+
+    <div v-if="showProfileModal" class="modal-overlay d-flex align-items-center justify-content-center" @click.self="showProfileModal = false">
+      <div class="modal-content-profile bg-white rounded-4 shadow-2xl border-0 overflow-hidden font-khmer">
+        
+        <div class="bg-primary p-4 text-white d-flex align-items-center gap-3 position-relative">
+            <div class="position-relative">
+                <img :src="editProfileForm.avatar" class="rounded-circle border border-3 border-white profile-avatar-lg" style="object-fit: cover;">
+                <div class="camera-icon-overlay" @click="triggerFileInput">
+                    <i class="bi bi-camera-fill"></i>
+                </div>
+                <input type="file" ref="fileInput" class="d-none" accept="image/*" @change="handleAvatarUpload">
+            </div>
+            <div>
+                <h5 class="fw-bold mb-1">{{ editProfileForm.name || 'User Name' }}</h5>
+                <span class="badge bg-white text-primary rounded-pill px-3">{{ user?.role === 'admin' ? 'អ្នកគ្រប់គ្រង' : 'សមាជិក' }}</span>
+            </div>
+             <button class="btn-close btn-close-white position-absolute top-0 end-0 m-3" @click="showProfileModal = false"></button>
+        </div>
+
+        <div class="p-4">
+             <form @submit.prevent="saveProfileChanges">
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-secondary small">ឈ្មោះអ្នកប្រើប្រាស់</label>
+                    <input v-model="editProfileForm.name" type="text" class="form-control form-control-lg fs-6" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-secondary small">អាសយដ្ឋានអ៊ីមែល</label>
+                    <input v-model="editProfileForm.email" type="email" class="form-control form-control-lg fs-6" required>
+                </div>
+
+                <hr class="border-secondary-subtle my-4 opacity-10">
+                <p class="text-center text-muted small mb-3">ប្តូរលេខសម្ងាត់ (ទុកទំនេរប្រសិនបើមិនប្តូរ)</p>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-secondary small">លេខសម្ងាត់ថ្មី</label>
+                        <div class="position-relative">
+                             <input v-model="editProfileForm.newPassword" :type="showPass ? 'text' : 'password'" class="form-control form-control-lg fs-6" placeholder="••••••••">
+                             <i class="bi position-absolute top-50 end-0 translate-middle-y me-3 cursor-pointer text-muted" 
+                                :class="showPass ? 'bi-eye-slash' : 'bi-eye'" @click="showPass = !showPass"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-secondary small">បញ្ជាក់លេខសម្ងាត់</label>
+                        <div class="position-relative">
+                            <input v-model="editProfileForm.confirmPassword" :type="showPass ? 'text' : 'password'" class="form-control form-control-lg fs-6" placeholder="••••••••">
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 mt-4 py-2 fw-bold">
+                    <i class="bi bi-check-circle-fill me-2"></i> រក្សាទុកការផ្លាស់ប្តូរ
+                </button>
+             </form>
+        </div>
+      </div>
+    </div>
+
   </header>
 </template>
 
@@ -196,12 +254,27 @@ localforage.config({ name: 'NP_News_App', storeName: 'articles' });
 const router = useRouter();
 const currentDate = new Date().toLocaleDateString('km-KH', { day: 'numeric', month: 'long', year: 'numeric' });
 
+// State
 const user = ref(null);
 const showDropdown = ref(false);
 const showModal = ref(false);
-const showMobileSearch = ref(false); // Added for responsive toggle
+const showMobileSearch = ref(false);
+const showProfileModal = ref(false); // New Profile Modal state
 const authMode = ref('login');
 const authForm = reactive({ name: '', email: '', password: '' });
+
+// Profile Edit State
+const editProfileForm = reactive({
+    name: '',
+    email: '',
+    role: '',
+    avatar: '',
+    originalEmail: '', // To track if email changed
+    newPassword: '',
+    confirmPassword: ''
+});
+const showPass = ref(false);
+const fileInput = ref(null);
 
 const MASTER_EMAIL = 'phanet@gmail.com';
 const MASTER_PASS = 'admin12345';
@@ -211,13 +284,25 @@ const searchResults = ref([]);
 const isFocused = ref(false);
 
 onMounted(() => {
+  // Load User
   const savedUser = localStorage.getItem('np_news_user');
-  if (savedUser) user.value = JSON.parse(savedUser);
+  if (savedUser) {
+    const parsed = JSON.parse(savedUser);
+    if (parsed.email === 'guest@test.com') {
+       localStorage.removeItem('np_news_user');
+       user.value = null;
+    } else {
+       user.value = parsed;
+    }
+  } else {
+    user.value = null;
+  }
   window.addEventListener('click', handleGlobalClick);
 });
 
 onUnmounted(() => window.removeEventListener('click', handleGlobalClick));
 
+// --- Search Logic ---
 const handleSearch = async () => {
   if (!searchQuery.value.trim()) {
     searchResults.value = [];
@@ -246,12 +331,14 @@ const goToArticle = async (item) => {
   router.push(`/news/${targetId}`);
 };
 
+// --- Auth Modal Logic ---
 const openAuthModal = (mode) => {
   authMode.value = mode;
   showModal.value = true;
 };
 
 const handleAuthSubmit = () => {
+  // Master Admin Login
   if (authForm.email === MASTER_EMAIL && authForm.password === MASTER_PASS) {
     const adminUser = {
       name: 'NP Administrator',
@@ -263,6 +350,7 @@ const handleAuthSubmit = () => {
     router.push('/management');
     return;
   }
+
   if (authMode.value === 'login') {
     const storedUser = localStorage.getItem(`user_${authForm.email}`);
     if (storedUser) {
@@ -272,7 +360,7 @@ const handleAuthSubmit = () => {
           name: parsedUser.name || 'User',
           email: parsedUser.email,
           role: parsedUser.email.includes('admin') ? 'admin' : 'user',
-          avatar: `https://ui-avatars.com/api/?name=${parsedUser.name}&background=6c757d&color=fff`
+          avatar: parsedUser.avatar || `https://ui-avatars.com/api/?name=${parsedUser.name}&background=6c757d&color=fff`
         };
         loginUser(sessionUser, sessionUser.role === 'admin');
         return;
@@ -280,7 +368,19 @@ const handleAuthSubmit = () => {
     }
     alert('អុីមែល ឬលេខសម្ងាត់មិនត្រឹមត្រូវ!');
   } else {
-    localStorage.setItem(`user_${authForm.email}`, JSON.stringify({ ...authForm }));
+    if(authForm.email === 'guest@test.com') {
+        alert('Email នេះមិនអាចប្រើបានទេ!');
+        return;
+    }
+    // Register
+    const newUser = {
+        name: authForm.name,
+        email: authForm.email,
+        password: authForm.password,
+        role: 'user',
+        avatar: `https://ui-avatars.com/api/?name=${authForm.name}&background=6c757d&color=fff`
+    };
+    localStorage.setItem(`user_${authForm.email}`, JSON.stringify(newUser));
     alert('ចុះឈ្មោះជោគជ័យ! សូមចូលប្រើប្រាស់។');
     authMode.value = 'login';
   }
@@ -301,8 +401,87 @@ const handleLogout = () => {
   router.push('/');
 };
 
-const toggleDropdown = () => (showDropdown.value = !showDropdown.value);
+// --- Profile Modal Logic (NEW) ---
+const openProfileModal = () => {
+    // Populate form with current user data
+    editProfileForm.name = user.value.name;
+    editProfileForm.email = user.value.email;
+    editProfileForm.originalEmail = user.value.email;
+    editProfileForm.role = user.value.role;
+    editProfileForm.avatar = user.value.avatar;
+    editProfileForm.newPassword = '';
+    editProfileForm.confirmPassword = '';
+    
+    showDropdown.value = false;
+    showProfileModal.value = true;
+};
 
+const triggerFileInput = () => {
+    fileInput.value.click();
+};
+
+const handleAvatarUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            editProfileForm.avatar = e.target.result; // Base64 string
+        };
+        reader.readAsDataURL(file);
+    }
+};
+
+const saveProfileChanges = () => {
+    // 1. Validate Password if entered
+    if (editProfileForm.newPassword || editProfileForm.confirmPassword) {
+        if (editProfileForm.newPassword !== editProfileForm.confirmPassword) {
+            alert('លេខសម្ងាត់ទាំងពីរមិនដូចគ្នាទេ!');
+            return;
+        }
+    }
+
+    // 2. Get current stored data
+    const storageKey = `user_${editProfileForm.originalEmail}`;
+    const storedData = JSON.parse(localStorage.getItem(storageKey) || '{}');
+
+    // 3. Update Data Object
+    const updatedUser = {
+        ...storedData,
+        name: editProfileForm.name,
+        email: editProfileForm.email,
+        avatar: editProfileForm.avatar,
+        // Only update password if new one is provided
+        password: editProfileForm.newPassword ? editProfileForm.newPassword : storedData.password
+    };
+
+    // 4. Handle Email Change (Move data to new key)
+    if (editProfileForm.email !== editProfileForm.originalEmail) {
+        // Remove old key
+        localStorage.removeItem(storageKey);
+        // Set new key
+        localStorage.setItem(`user_${editProfileForm.email}`, JSON.stringify(updatedUser));
+    } else {
+        // Update existing key
+        localStorage.setItem(storageKey, JSON.stringify(updatedUser));
+    }
+
+    // 5. Update Session User (np_news_user)
+    const sessionUser = {
+        name: updatedUser.name,
+        email: updatedUser.email,
+        role: user.value.role, // role persists
+        avatar: updatedUser.avatar
+    };
+    user.value = sessionUser;
+    localStorage.setItem('np_news_user', JSON.stringify(sessionUser));
+
+    // 6. Close Modal
+    alert('រក្សាទុកការផ្លាស់ប្តូរជោគជ័យ!');
+    showProfileModal.value = false;
+};
+
+// --- General Utils ---
+const toggleDropdown = () => (showDropdown.value = !showDropdown.value);
 const handleGlobalClick = (e) => {
   if (!e.target.closest('.profile-img')) showDropdown.value = false;
   if (!e.target.closest('.search-wrapper')) isFocused.value = false;
@@ -310,7 +489,6 @@ const handleGlobalClick = (e) => {
 </script>
 
 <style scoped>
-/* ALL STYLES PRESERVED EXACTLY AS PROVIDED */
 @import url('https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;700;900&display=swap');
 
 .font-khmer { font-family: 'Khmer OS Battambang', sans-serif; }
@@ -326,11 +504,32 @@ const handleGlobalClick = (e) => {
   background: rgba(15, 23, 42, 0.6); z-index: 3000; backdrop-filter: blur(8px);
 }
 .modal-content-custom { width: 90%; max-width: 420px; animation: modalIn 0.3s ease-out; }
+.modal-content-profile { width: 90%; max-width: 500px; animation: modalIn 0.3s ease-out; }
 
 @keyframes modalIn {
-  from { transform: scale(0.9); opacity: 0; }
+  from { transform: scale(0.95); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
 }
+
+/* Profile Modal Specifics */
+.profile-avatar-lg { width: 80px; height: 80px; }
+.camera-icon-overlay {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: #fff;
+    color: #0d6efd;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.camera-icon-overlay:hover { transform: scale(1.1); }
 
 /* Ticker Animation */
 .ticker-content { white-space: nowrap; overflow: hidden; width: 100%; }
@@ -358,6 +557,7 @@ const handleGlobalClick = (e) => {
   padding: 8px !important;
   right: 0;
 }
+.dropdown-menu.show { display: block; }
 .dropdown-item {
   padding: 10px 15px;
   display: flex;
@@ -402,7 +602,6 @@ const handleGlobalClick = (e) => {
 }
 .search-result-item:hover { background: #f0f7ff; }
 
-/* Styles for Result Images & Media Thumbnails */
 .result-img, .media-thumbnail {
   width: 44px; height: 44px;
   object-fit: cover; border-radius: 8px;
@@ -412,7 +611,6 @@ const handleGlobalClick = (e) => {
 .result-title { font-size: 0.85rem; font-weight: 600; color: #1e293b; line-height: 1.4; }
 .text-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-/* Simple toggle animation for mobile search */
 .animate-slide-down {
   animation: slideIn 0.2s ease-out;
 }
