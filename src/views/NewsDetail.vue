@@ -1,7 +1,29 @@
 <template>
   <div class="news-app-wrapper bg-light-subtle min-vh-100 font-khmer">
+    
+    <Transition name="modal-pop">
+      <div v-if="alertState.show" class="modal-overlay" @click.self="closeAlert">
+        <div class="modal-content-box shadow-lg text-center">
+          
+          <div v-if="alertState.type === 'success'" class="icon-wrapper success mb-3">
+             <div class="icon-circle">
+                <i class="bi bi-check-lg"></i>
+             </div>
+          </div>
+
+          <div v-else class="icon-wrapper warning mb-3">
+             <div class="icon-circle">
+                <i class="bi bi-exclamation-lg"></i>
+             </div>
+          </div>
+
+          <h2 class="fw-bold text-secondary mb-2">{{ alertState.title }}</h2>
+          <p class="text-muted fs-6">{{ alertState.message }}</p>
+        </div>
+      </div>
+    </Transition>
+
     <div class="container py-5" v-if="article">
-      
       <div class="row g-5">
         <div class="col-lg-8">
           <button @click="router.back()" class="btn btn-white shadow-sm px-4 mb-4 text-secondary border-0">
@@ -22,7 +44,7 @@
 
           <div class="mb-4 py-3 d-flex align-items-center justify-content-between px-3 shadow bg-white">
             <div class="d-flex align-items-center gap-2">
-              <img :src="`https://ui-avatars.com/api/?name=${article.author || 'Admin'}&background=0d6efd&color=fff`" class="shadow-sm" width="35" height="35">
+              <img :src="`https://ui-avatars.com/api/?name=${article.author || 'Admin'}&background=0d6efd&color=fff`" class="shadow-sm rounded-circle" width="35" height="35" style="border-radius: 50% !important;">
               <span class="small text-muted">ដោយ៖ <strong class="text-dark">{{ article.author || 'NP News Admin' }}</strong></span>
             </div>
             
@@ -54,8 +76,7 @@
 
             <div v-if="article.comments?.length > 0">
               <div v-for="(c, idx) in article.comments" :key="idx" class="d-flex gap-3 mb-4 p-3 bg-white shadow-sm border-0 comment-item">
-                <img :src="c.userAvatar || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'" class="shadow-sm" style="width: 45px; height: 45px; object-fit: cover;">
-                
+                <img :src="c.userAvatar || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'" class="shadow-sm" style="width: 45px; height: 45px; object-fit: cover; border-radius: 50% !important;">
                 <div class="w-100">
                   <div class="d-flex justify-content-between align-items-center mb-1">
                     <span class="fw-bold text-primary">{{ c.userName }}</span>
@@ -115,21 +136,49 @@ const newCommentText = ref('');
 const allNewsData = ref([]);
 const isLoading = ref(true);
 
+// --- NEW Alert State ---
+const alertState = ref({
+  show: false,
+  type: 'success', // 'success' or 'warning'
+  title: '',
+  message: ''
+});
+
 localforage.config({ name: 'NP_News_App', storeName: 'articles' });
 
-// --- Helper: Enhanced Auth Check ---
+// --- Enhanced Alert Function ---
+const showAlert = (message, type = 'warning') => {
+  const titleMap = {
+    success: 'ជោគជ័យ',
+    warning: 'ជូនដំណឹង'
+  };
+  
+  alertState.value = {
+    show: true,
+    type: type,
+    title: titleMap[type],
+    message: message
+  };
+
+  // Auto close after 2.5 seconds
+  setTimeout(() => {
+    closeAlert();
+  }, 2500);
+};
+
+const closeAlert = () => {
+  alertState.value.show = false;
+};
+
+// --- Helper: Auth Check ---
 const getSessionUser = () => {
   const sessionData = localStorage.getItem('np_news_user');
   if (!sessionData) return null;
-  
   const currentUser = JSON.parse(sessionData);
-  
-  // Explicitly block the guest account from being recognized as "logged in"
   if (currentUser.email === 'guest@test.com') {
-    localStorage.removeItem('np_news_user'); // Clean it up
+    localStorage.removeItem('np_news_user');
     return null;
   }
-  
   return currentUser;
 };
 
@@ -142,7 +191,6 @@ const loadData = async () => {
       allNewsData.value = saved;
       const found = allNewsData.value.find(item => item.id == route.params.id);
       article.value = found;
-      
       recentNews.value = allNewsData.value
         .filter(item => item.id != route.params.id)
         .slice(0, 6);
@@ -164,24 +212,27 @@ const saveToDB = async () => {
 const handleLike = () => {
   const currentUser = getSessionUser();
   if (!currentUser) {
-    alert("សូមចូលប្រើប្រាស់គណនីរបស់អ្នក ដើម្បីចូលចិត្តអត្ថបទនេះ!");
+    showAlert("សូមចូលប្រើប្រាស់គណនីរបស់អ្នកជាមុនសិន!", 'warning');
     return;
   }
 
-  if (!article.value.isLiked) {
-    article.value.likes = (article.value.likes || 0) + 1;
-    article.value.isLiked = true;
-  } else {
-    article.value.likes = Math.max(0, (article.value.likes || 0) - 1);
-    article.value.isLiked = false;
-  }
+  article.value.isLiked = !article.value.isLiked;
+  article.value.likes = article.value.isLiked 
+    ? (article.value.likes || 0) + 1 
+    : Math.max(0, (article.value.likes || 0) - 1);
+  
   saveToDB();
+  
+  // Show success alert only if adding a like
+  if(article.value.isLiked) {
+     showAlert("អ្នកបានចូលចិត្តអត្ថបទនេះ", 'success');
+  }
 };
 
 const submitComment = () => {
   const currentUser = getSessionUser();
   if (!currentUser) {
-    alert("សូមចូលប្រើប្រាស់គណនីរបស់អ្នក ដើម្បីបញ្ចេញមតិយោបល់!");
+    showAlert("សូមចូលប្រើប្រាស់គណនីរបស់អ្នក ដើម្បីបញ្ចេញមតិ!", 'warning');
     return;
   }
 
@@ -199,6 +250,9 @@ const submitComment = () => {
   article.value.comments.unshift(newComment);
   newCommentText.value = ''; 
   saveToDB();
+
+  // Trigger the Success Modal
+  showAlert("ទិន្នន័យត្រូវបានរក្សាទុកដោយជោគជ័យ", 'success');
 };
 
 const deleteComment = (index) => {
@@ -210,8 +264,7 @@ const deleteComment = (index) => {
 
 const isMyComment = (comment) => {
   const currentUser = getSessionUser();
-  if (!currentUser) return false;
-  return comment.userEmail === currentUser.email;
+  return currentUser && comment.userEmail === currentUser.email;
 };
 
 const goToNews = (id) => {
@@ -230,7 +283,6 @@ const getKhmerCategory = (en) => {
 };
 
 onMounted(() => {
-  // Clear any existing "Guest" data on entry
   getSessionUser(); 
   loadData();
 });
@@ -242,20 +294,97 @@ watch(() => route.params.id, loadData);
 /* Sharp Edges Design System */
 * { border-radius: 0 !important; }
 
+/* Exception for the specific UI elements that need roundness */
+.rounded-circle { border-radius: 50% !important; }
+
 .font-khmer { font-family: 'Battambang', sans-serif; }
 .cursor-pointer { cursor: pointer; }
 .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
-/* Shadows & Transitions */
+/* --- NEW MODAL STYLES --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  backdrop-filter: blur(2px);
+}
+
+.modal-content-box {
+  background: white;
+  padding: 40px;
+  width: 90%;
+  max-width: 350px;
+  /* Override global border-radius 0 for the modal to match screenshot */
+  border-radius: 12px !important; 
+  position: relative;
+}
+
+/* Icon Animation & Style */
+.icon-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50% !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+/* Success Theme */
+.icon-wrapper.success .icon-circle {
+  background-color: #dcfce7; /* Light Green */
+  border: 4px solid #f0fdf4; /* Lighter ring */
+}
+.icon-wrapper.success i {
+  font-size: 3rem;
+  color: #22c55e; /* Green check */
+}
+
+/* Warning Theme */
+.icon-wrapper.warning .icon-circle {
+  background-color: #fef9c3;
+  border: 4px solid #fefce8;
+}
+.icon-wrapper.warning i {
+  font-size: 3rem;
+  color: #eab308;
+}
+
+.text-secondary { color: #374151 !important; }
+
+/* Pop Animation */
+.modal-pop-enter-active,
+.modal-pop-leave-active {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal-pop-enter-from,
+.modal-pop-leave-to {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+.modal-pop-enter-to,
+.modal-pop-leave-from {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* --- End New Modal Styles --- */
+
 .shadow-sm { box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important; }
 .shadow { box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important; }
 .shadow-inner { box-shadow: inset 0 2px 4px rgba(0,0,0,0.06) !important; }
 
 .news-sidebar-item:hover { background-color: #f8f9fa; transition: 0.2s; }
 .bg-light-subtle { background-color: #f2f4f7 !important; }
-
-/* Custom Borders & Layout */
-.border-primary { border-left: 4px solid #0d6efd !important; }
 
 .transition-btn { transition: all 0.2s ease; transform: scale(1); }
 .transition-btn:active { transform: scale(0.95); }

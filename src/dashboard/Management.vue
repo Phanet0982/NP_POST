@@ -1,7 +1,47 @@
 <template>
   <div class="min-h-screen bg-slate-50 font-khmer flex flex-col lg:flex-row text-slate-700">
     
-    <header class="lg:hidden bg-white border-b border-gray-200 px-4 h-16 flex items-center justify-between sticky top-0 z-50">
+    <Transition name="modal-pop">
+      <div v-if="modalState.show" class="modal-overlay" @click.self="closeModalOutside">
+        <div class="modal-content-box shadow-2xl text-center">
+          
+          <div v-if="modalState.type === 'success'" class="icon-wrapper success mb-4">
+             <div class="icon-circle">
+                <i class="bi bi-check-lg"></i>
+             </div>
+          </div>
+
+          <div v-else-if="modalState.type === 'warning'" class="icon-wrapper warning mb-4">
+             <div class="icon-circle">
+                <i class="bi bi-exclamation-lg"></i>
+             </div>
+          </div>
+
+          <div v-else-if="modalState.type === 'confirm'" class="icon-wrapper danger mb-4">
+             <div class="icon-circle">
+                <i class="bi bi-trash3-fill"></i>
+             </div>
+          </div>
+
+          <h2 class="text-xl font-bold text-slate-800 mb-2">{{ modalState.title }}</h2>
+          <p class="text-sm text-slate-500 mb-6 px-4">{{ modalState.message }}</p>
+
+          <div v-if="modalState.type === 'confirm'" class="flex gap-3 justify-center">
+            <button @click="closeModal" class="px-6 py-2.5 rounded-xl bg-slate-100 text-slate-600 font-bold text-sm hover:bg-slate-200 transition-colors">
+              បោះបង់
+            </button>
+            <button @click="executeConfirm" class="px-6 py-2.5 rounded-xl bg-red-500 text-white font-bold text-sm hover:bg-red-600 shadow-lg shadow-red-200 transition-all">
+              យល់ព្រមលុប
+            </button>
+          </div>
+
+          <button v-else @click="closeModal" class="px-8 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-bold text-sm hover:bg-slate-200 transition-colors">
+            បិទ
+          </button>
+        </div>
+      </div>
+    </Transition>
+    <header class="lg:hidden bg-white border-b border-gray-200 px-4 h-16 flex items-center justify-between sticky top-0 z-40">
       <div class="flex items-center gap-2">
         <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
           <i class="bi bi-newspaper text-white"></i>
@@ -14,7 +54,7 @@
     </header>
 
     <aside :class="[mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0']" 
-      class="fixed inset-y-0 left-0 w-64 bg-white flex flex-col border-r border-gray-200 z-50 transition-transform duration-300 ease-in-out lg:sticky lg:h-screen lg:z-40">
+      class="fixed inset-y-0 left-0 w-64 bg-white flex flex-col border-r border-gray-200 z-50 transition-transform duration-300 ease-in-out lg:sticky lg:h-screen lg:z-30">
       
       <div class="p-6">
         <div class="hidden lg:flex mb-8 items-center gap-2 px-2">
@@ -117,15 +157,15 @@
                 <textarea v-model="form.content" rows="4" placeholder="ខ្លឹមសារអត្ថបទ..." class="w-full px-4 py-3 bg-slate-50 border-none rounded-xl focus:ring-2 focus:ring-blue-100 outline-none transition-all resize-none text-sm"></textarea>
 
                 <div class="grid grid-cols-2 gap-3">
-                  <select v-model="form.category" class="px-3 py-3 bg-slate-50 rounded-xl text-[12px] outline-none">
+                  <select v-model="form.category" class="px-3 py-3 bg-slate-50 rounded-xl text-[12px] outline-none border-none">
                     <option v-for="cat in categoriesKhmer" :key="cat.en" :value="cat.en">{{ cat.kh }}</option>
                   </select>
-                  <input v-model="form.author" type="text" placeholder="អ្នកនិពន្ធ..." class="px-3 py-3 bg-slate-50 rounded-xl text-sm outline-none font-bold">
+                  <input v-model="form.author" type="text" placeholder="អ្នកនិពន្ធ..." class="px-3 py-3 bg-slate-50 rounded-xl text-sm outline-none font-bold border-none">
                 </div>
 
                 <div class="flex gap-2">
                   <button v-if="isEditing" @click="resetForm" class="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold text-sm">បោះបង់</button>
-                  <button @click="publishNews" :class="isEditing ? 'bg-amber-500' : 'bg-blue-600'" class="flex-[2] py-3 text-white rounded-xl font-bold text-sm shadow-lg">
+                  <button @click="publishNews" :class="isEditing ? 'bg-amber-500' : 'bg-blue-600'" class="flex-[2] py-3 text-white rounded-xl font-bold text-sm shadow-lg hover:opacity-90 transition-opacity">
                     {{ isEditing ? 'ធ្វើបច្ចុប្បន្នភាព' : 'រក្សាទុក' }}
                   </button>
                 </div>
@@ -138,8 +178,8 @@
               <div class="p-6 border-b border-gray-50 flex items-center justify-between">
                 <h3 class="font-bold text-slate-800">បញ្ជីអត្ថបទ</h3>
                 <div class="relative">
-                  <i class="bi bi-search absolute left-4 top-8 -translate-y-1/2 text-slate-400"></i>
-                  <input v-model="searchQuery" type="text" placeholder="ស្វែងរក..." class="pl-10 pr-4 py-2 bg-slate-50 rounded-xl text-sm outline-none w-64 focus:ring-2 focus:ring-blue-100 transition-all">
+                  <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                  <input v-model="searchQuery" type="text" placeholder="ស្វែងរក..." class="pl-10 pr-4 py-2 bg-slate-50 rounded-xl text-sm outline-none w-64 focus:ring-2 focus:ring-blue-100 transition-all border-none">
                 </div>
               </div>
 
@@ -172,7 +212,7 @@
                       <td class="px-6 py-4 text-right">
                         <div class="flex items-center justify-end gap-1">
                           <button @click="startEdit(item)" class="p-2 text-amber-500 hover:bg-amber-50 rounded-lg transition-all"><i class="bi bi-pencil-square"></i></button>
-                          <button @click="deleteNews(item.id)" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all"><i class="bi bi-trash"></i></button>
+                          <button @click="askDelete(item.id)" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all"><i class="bi bi-trash"></i></button>
                         </div>
                       </td>
                     </tr>
@@ -196,7 +236,6 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import Swal from 'sweetalert2';
 import localforage from 'localforage';
 
 // Database Config
@@ -208,6 +247,15 @@ const activeTableTab = ref('All');
 const mobileMenuOpen = ref(false);
 const currentTime = ref('');
 const publishedNews = ref([]);
+
+// --- MODAL STATE ---
+const modalState = ref({
+  show: false,
+  type: 'success', // success, warning, confirm
+  title: '',
+  message: '',
+  confirmCallback: null
+});
 
 const isEditing = ref(false);
 const editingId = ref(null);
@@ -234,7 +282,6 @@ const categoriesKhmer = [
 onMounted(async () => {
   const savedData = await localforage.getItem('news_list');
   if (savedData) publishedNews.value = savedData;
-
   updateTime();
   setInterval(updateTime, 1000);
 });
@@ -244,20 +291,43 @@ const updateTime = () => {
   currentTime.value = now.toLocaleTimeString('km-KH', { hour: '2-digit', minute: '2-digit' }) + ' | ' + now.toLocaleDateString('km-KH', { day: 'numeric', month: 'long' });
 };
 
+// --- Custom Alert Helper ---
+const showToast = (title, message, type = 'success') => {
+  modalState.value = { show: true, type, title, message, confirmCallback: null };
+  if (type !== 'confirm') {
+    setTimeout(() => { modalState.value.show = false; }, 2500);
+  }
+};
+
+const showConfirmModal = (title, message, callback) => {
+  modalState.value = { show: true, type: 'confirm', title, message, confirmCallback: callback };
+};
+
+const closeModal = () => {
+  modalState.value.show = false;
+};
+
+const closeModalOutside = () => {
+  if (modalState.value.type !== 'confirm') {
+    closeModal();
+  }
+};
+
+const executeConfirm = () => {
+  if (modalState.value.confirmCallback) {
+    modalState.value.confirmCallback();
+  }
+  closeModal();
+};
+
 // --- Actions ---
 const handleMediaUpload = (e) => {
   const file = e.target.files[0];
   if (file) {
     if (file.size > 100 * 1024 * 1024) {
-      // Updated Khmer Alert
-      return Swal.fire({
-        icon: 'error',
-        title: 'កំហុស',
-        text: 'ទំហំឯកសារធំពេក (លើសពី 100MB)',
-        confirmButtonText: 'យល់ព្រម'
-      });
+      showToast('កំហុស', 'ទំហំឯកសារធំពេក (លើសពី 100MB)', 'warning');
+      return;
     }
-    
     form.mediaType = file.type.startsWith('video') ? 'video' : 'image';
     const reader = new FileReader();
     reader.onload = (event) => form.media = event.target.result;
@@ -267,14 +337,8 @@ const handleMediaUpload = (e) => {
 
 const publishNews = async () => {
   if (!form.title || !form.media) {
-    // Updated Khmer Alert
-    return Swal.fire({
-      icon: 'warning',
-      title: 'មិនទាន់ពេញលេញ',
-      text: 'សូមបំពេញចំណងជើង និងរូបភាព/វីដេអូ',
-      confirmButtonText: 'យល់ព្រម',
-      confirmButtonColor: '#f59e0b'
-    });
+    showToast('មិនទាន់ពេញលេញ', 'សូមបំពេញចំណងជើង និងរូបភាព/វីដេអូ', 'warning');
+    return;
   }
 
   if (isEditing.value) {
@@ -284,50 +348,35 @@ const publishNews = async () => {
     publishedNews.value.unshift({
       ...form,
       id: Date.now(),
-      date: new Date().toLocaleDateString('km-KH', { day: 'numeric', month: 'short' })
+      date: new Date().toLocaleDateString('km-KH', { day: 'numeric', month: 'short' }),
+      likes: 0,
+      comments: []
     });
   }
 
   await localforage.setItem('news_list', JSON.parse(JSON.stringify(publishedNews.value)));
   
-  // Updated Success Alert
-  Swal.fire({ 
-    icon: 'success', 
-    title: 'ជោគជ័យ', 
-    text: 'ទិន្នន័យត្រូវបានរក្សាទុក',
-    timer: 1500, 
-    showConfirmButton: false 
-  });
+  showToast('ជោគជ័យ', 'ទិន្នន័យត្រូវបានរក្សាទុក', 'success');
   resetForm();
 };
 
-const deleteNews = async (id) => {
-  // Updated Delete Confirmation with Khmer Text and Styling
-  const res = await Swal.fire({ 
-    title: 'តើអ្នកពិតជាចង់លុបមែនទេ?',
-    text: "ទិន្នន័យនឹងមិនអាចត្រឡប់មកវិញបានឡើយ!",
-    icon: 'warning', 
-    showCancelButton: true, 
-    confirmButtonColor: '#ef4444',
-    cancelButtonColor: '#64748b',
-    confirmButtonText: 'លុបចេញ',
-    cancelButtonText: 'បោះបង់',
-    reverseButtons: true
-  });
+const askDelete = (id) => {
+  showConfirmModal(
+    'បញ្ជាក់ការលុប?', 
+    'តើអ្នកពិតជាចង់លុបអត្ថបទនេះមែនទេ? ទិន្នន័យមិនអាចយកមកវិញបានឡើយ។', 
+    () => deleteNews(id)
+  );
+};
 
-  if (res.isConfirmed) {
-    publishedNews.value = publishedNews.value.filter(n => n.id !== id);
-    await localforage.setItem('news_list', JSON.parse(JSON.stringify(publishedNews.value)));
-    if (editingId.value === id) resetForm();
-    
-    Swal.fire({
-      icon: 'success',
-      title: 'បានលុប',
-      text: 'ទិន្នន័យត្រូវបានលុបជោគជ័យ',
-      showConfirmButton: false,
-      timer: 1000
-    });
-  }
+const deleteNews = async (id) => {
+  publishedNews.value = publishedNews.value.filter(n => n.id !== id);
+  await localforage.setItem('news_list', JSON.parse(JSON.stringify(publishedNews.value)));
+  if (editingId.value === id) resetForm();
+  
+  // Wait a small bit for the modal to close first, then show success
+  setTimeout(() => {
+    showToast('បានលុប', 'ទិន្នន័យត្រូវបានលុបជោគជ័យ', 'success');
+  }, 300);
 };
 
 const startEdit = (item) => {
@@ -365,41 +414,93 @@ const filteredTableData = computed(() => {
 @import url('https://fonts.googleapis.com/css2?family=Battambang:wght@400;700;900&display=swap');
 @import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css');
 
-.font-khmer { font-family: 'Battambang', 'Khmer OS Battambang', sans-serif; }
-
-/* --- SweetAlert2 Global Font Overrides --- */
-/* Use :deep() to force styles into child components like SweetAlert */
-:deep(.swal2-popup),
-:deep(.swal2-title),
-:deep(.swal2-html-container),
-:deep(.swal2-confirm),
-:deep(.swal2-cancel) {
-  font-family: 'Battambang', 'Khmer OS Battambang', sans-serif !important;
-}
-
-:deep(.swal2-title) {
-  font-size: 1.25rem !important; /* 20px */
-}
-
-/* Styled SweetAlert Buttons to match Tailwind */
-:deep(.swal2-confirm) {
-  border-radius: 0.75rem !important;
-  padding: 0.6rem 2rem !important;
-  font-weight: 700 !important;
-  box-shadow: none !important;
-}
-
-:deep(.swal2-cancel) {
-  border-radius: 0.75rem !important;
-  padding: 0.6rem 2rem !important;
-  font-weight: 700 !important;
-}
-
-/* Custom Transitions */
-.dropdown-enter-active, .dropdown-leave-active { transition: all 0.2s ease-out; }
-.dropdown-enter-from, .dropdown-leave-to { opacity: 0; transform: translateY(-10px); }
+.font-khmer { font-family: 'Battambang', sans-serif; }
 
 /* Custom Scrollbar */
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+
+/* --- CUSTOM MODAL STYLES (Identical to NewsDetail) --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  backdrop-filter: blur(2px);
+}
+
+.modal-content-box {
+  background: white;
+  padding: 40px;
+  width: 90%;
+  max-width: 400px;
+  border-radius: 20px !important; 
+  position: relative;
+}
+
+/* Icon Animation & Style */
+.icon-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50% !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+/* Success Theme */
+.icon-wrapper.success .icon-circle {
+  background-color: #dcfce7; /* Light Green */
+  border: 4px solid #f0fdf4; /* Lighter ring */
+}
+.icon-wrapper.success i {
+  font-size: 3rem;
+  color: #22c55e;
+}
+
+/* Warning Theme */
+.icon-wrapper.warning .icon-circle {
+  background-color: #fef9c3;
+  border: 4px solid #fefce8;
+}
+.icon-wrapper.warning i {
+  font-size: 3rem;
+  color: #eab308;
+}
+
+/* Danger/Delete Theme */
+.icon-wrapper.danger .icon-circle {
+  background-color: #fee2e2;
+  border: 4px solid #fef2f2;
+}
+.icon-wrapper.danger i {
+  font-size: 3rem;
+  color: #ef4444;
+}
+
+/* Pop Animation */
+.modal-pop-enter-active,
+.modal-pop-leave-active {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal-pop-enter-from,
+.modal-pop-leave-to {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+.modal-pop-enter-to,
+.modal-pop-leave-from {
+  opacity: 1;
+  transform: scale(1);
+}
 </style>
